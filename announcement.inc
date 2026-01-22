@@ -13,17 +13,23 @@
 
 <h3>Announcements Manager</h3>
 
-<select id="mp3_select" class="submit" style="border:2px solid #444;">
+<!-- MP3 Section -->
+<select id="mp3_select" class="submit" style="border:2px solid #444; width: 250px;">
     <option value="">-- Select MP3 --</option>
 </select>
 
 <input type="button" class="submit" value="Install Announcement" id="install_announcement">
+<input type="button" class="submit" value="Delete MP3" id="delete_mp3" style="background-color:#dc3545; color:white; border:1px solid #c82333;">
 
-<select id="ul_select" class="submit" style="border:2px solid #444;">
+<br><br>
+
+<!-- UL Section -->
+<select id="ul_select" class="submit" style="border:2px solid #444; width: 250px;">
     <option value="">-- Select Announcement --</option>
 </select>
 
 <input type="button" class="submit" value="Play Now" id="run_ul">
+<input type="button" class="submit" value="Delete UL" id="delete_ul" style="background-color:#dc3545; color:white; border:1px solid #c82333;">
 
 <br><br>
 
@@ -51,18 +57,24 @@
 
 $(document).ready(function () {
 
-    // ====== MP3 Dropdown for Conversion ======
-    $.getJSON("custom/list_mp3.php", function(files) {
-        files.forEach(function(f) {
-            $("#mp3_select").append($("<option>").val(f).text(f));
+    // ====== MP3 Dropdown ======
+    function loadMP3Dropdown() {
+        $.getJSON("custom/list_mp3.php", function(files) {
+            $("#mp3_select").empty().append(
+                $("<option>").val("").text("-- Select MP3 --")
+            );
+            files.forEach(function(f) {
+                $("#mp3_select").append($("<option>").val(f).text(f));
+            });
         });
-    });
+    }
+    loadMP3Dropdown();
 
     // ====== UL Dropdown ======
     function loadULDropdown() {
         $.getJSON("custom/list_ul.php", function(files) {
             $("#ul_select").empty().append(
-                $("<option>").val("").text("-- Select UL File --")
+                $("<option>").val("").text("-- Select Announcement --")
             );
             files.forEach(function(f) {
                 $("#ul_select").append($("<option>").val(f).text(f));
@@ -70,6 +82,42 @@ $(document).ready(function () {
         });
     }
     loadULDropdown();
+
+    // ====== Delete MP3 Button ======
+    $("#delete_mp3").click(function() {
+        let mp3 = $("#mp3_select").val();
+        if (!mp3) {
+            alert("Please select an MP3 file to delete.");
+            return;
+        }
+        if (!confirm("Delete MP3 file '" + mp3 + "'? This cannot be undone.")) return;
+
+        $.post("custom/delete_file.php", { type: "mp3", file: mp3 }, function(data) {
+            alert(data);
+            loadMP3Dropdown(); // Refresh MP3 dropdown
+        }).fail(function() {
+            alert("Failed to delete MP3 file. Check server logs.");
+        });
+    });
+
+    // ====== Delete UL Button ======
+  // ====== Delete UL Button ======
+$("#delete_ul").click(function() {
+    let ul = $("#ul_select").val();
+    if (!ul) {
+        alert("Please select a UL file to delete.");
+        return;
+    }
+    if (!confirm("Delete UL file '" + ul + ".ul'? This cannot be undone.")) return;
+
+    // FIXED: Send the base name only (no extra .ul)
+    $.post("custom/delete_file.php", { type: "ul", file: ul }, function(data) {
+        alert(data);
+        loadULDropdown(); // Refresh UL dropdown
+    }).fail(function() {
+        alert("Failed to delete UL file. Check server logs.");
+    });
+});
 
     // ====== Cron List ======
     function loadCronList() {
@@ -184,7 +232,6 @@ $(document).ready(function () {
                         });
                     });
 
-                // Add all buttons to Actions column
                 row.append($("<td>").append(playBtn).append(editBtn).append(delBtn));
 
                 table.append(row);
