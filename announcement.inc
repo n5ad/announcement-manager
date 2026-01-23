@@ -286,12 +286,12 @@ $(document).ready(function () {
         let mp3 = $("#mp3_select").val();
         if (!mp3) { alert("Please select an MP3 file."); return; }
 
-        let min   = prompt("Minute:", "45"); if(min===null) return;
-        let hour  = prompt("Hour:", "8-21"); if(hour===null) return;
-        let dom   = prompt("DOM:", "1-24"); if(dom===null) return;
-        let month = prompt("Month:", "*"); if(month===null) return;
-        let dow   = prompt("DOW:", "*"); if(dow===null) return;
-        let desc  = prompt("Description:", "Scheduled announcement");
+        let min   = prompt("Minute: Which minuteof the hour? ", "45"); if(min===null) return;
+        let hour  = prompt("Hour: Which hours do you want? * = every hour or a specific like 8,13,20 or a range like 8-20", "8-21"); if(hour===null) return;
+        let dom   = prompt("DOM: Which days of the month? * is everyday or a specific like 1,7,18 or 1-17 as a range", "1-24"); if(dom===null) return;
+        let month = prompt("Month: Which month(s) * = every or specific like 3 or a range like 7-10", "*"); if(month===null) return;
+        let dow   = prompt("DOW: Which day(s) of the week? Sun=1 Sat =7 you can choose all * or a specific or a range", "*"); if(dow===null) return;
+        let desc  = prompt("Description: Name this announcement", "Scheduled announcement");
 
         if (!desc || desc.trim()==="") {
             alert("Description required.");
