@@ -1,0 +1,16 @@
+# /etc/sudoers.d/99-supermon-announcements
+# Supermon Announcements Manager - N5AD
+# Passwordless sudo for www-data to run required commands only
+# Created/updated: January 2026
+
+# Allow running playaudio.sh (announcement playback)
+www-data ALL=(root) NOPASSWD: /etc/asterisk/local/playaudio.sh
+
+# Allow managing root's crontab (for scheduling announcements)
+www-data ALL=(root) NOPASSWD: /usr/bin/crontab
+
+# Allow running audio_convert.sh (MP3 to .ul conversion)
+www-data ALL=(root) NOPASSWD: /etc/asterisk/local/audio_convert.sh
+
+# NO OTHER COMMANDS ALLOWED - do NOT add /bin/cp, /bin/chown, /bin/chmod
+# These are dangerous if unrestricted
