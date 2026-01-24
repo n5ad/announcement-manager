@@ -1,28 +1,36 @@
 <?php
+
 /**
-*created by n5ad
-*date 1-6-2026
-*/
 
-$files = glob("/mp3/*.mp3");
+ * list_mp3.php
 
+ * Lists both .mp3 and .wav files in /mp3/ for the Announcements Manager
 
-$out = [];
+ * CREATED BY N5AD
 
-
-foreach ($files as $f) {
+ */
 
 
-    $out[] = basename($f);
+$files = [];
 
+
+// Find .mp3 files
+
+$mp3_files = glob("/mp3/*.mp3");
+
+foreach ($mp3_files as $f) {
+
+    $files[] = basename($f);
 
 }
 
 
+// Find .wav files
 
-header('Content-Type: application/json');
+$wav_files = glob("/mp3/*.wav");
 
+foreach ($wav_files as $f) {
 
-echo json_encode($out);
+    $files[] = basename($f);
 
-
+}
