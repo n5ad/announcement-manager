@@ -26,6 +26,7 @@ TEMP_CLONE="/tmp/supermon-announcements"
 TARGET_DIR="/var/www/html/supermon/custom"
 LINK_PHP="/var/www/html/supermon/link.php"
 MP3_DIR="/mp3"
+SOUNDS_DIR="/usr/local/share/asterisk/sounds"
 LOCAL_DIR="/etc/asterisk/local"
 
 # ────────────────────────────────────────────────
@@ -108,6 +109,7 @@ echo "MP3 directory permissions set with setgid. $MP3_USER can now access /mp3."
 # 4. Set ownership & permissions on custom files
 echo_step "4. Setting ownership & permissions"
 chown -R www-data:www-data "$TARGET_DIR"
+chown -R www-data:www-data "$SOUNDS_DIR"
 find "$TARGET_DIR" -type f -name "*.php" -exec chmod 644 {} \;
 find "$TARGET_DIR" -type f -name "*.inc" -exec chmod 644 {} \;
 
