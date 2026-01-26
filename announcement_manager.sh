@@ -84,7 +84,7 @@ echo_step "2. Copying files to $TARGET_DIR"
 mkdir -p "$TARGET_DIR"
 cp -v "$TEMP_CLONE"/*.{php,inc} "$TARGET_DIR"/ 2>/dev/null || warn "No .php/.inc files found"
 rm -rf "$TEMP_CLONE"
-
+chmod +x $TARGET_DIR"
 # 3. Create /mp3 dir + permissions
 echo_step "3. Creating /mp3 directory"
 mkdir -p "$MP3_DIR"
