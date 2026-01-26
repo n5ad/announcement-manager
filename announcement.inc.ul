@@ -99,7 +99,7 @@ $(document).ready(function () {
     $("#delete_ul").click(function() {
         let ul = $("#ul_select").val();
         if (!ul) { alert("Select a UL file."); return; }
-        if (!confirm("Delete '" + ul + ".ul'?")) return;
+        if (!confirm("Delete '" + ul + "' (.ul file)?")) return;
         $.post("custom/delete_file.php", { type: "ul", file: ul }, function(data) {
             alert(data);
             loadULDropdown();
