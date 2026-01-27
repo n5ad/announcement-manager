@@ -567,12 +567,6 @@ foreach($nodes as $node) {
 <div id="spinny">
 </div>
 
- 
-
- 
-<br>
-<br>
-<br>
 <?php
 include_once "custom/announcement.inc";
 echo "<br><br>";
