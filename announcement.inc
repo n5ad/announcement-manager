@@ -5,7 +5,7 @@
 <?php if (isset($_SESSION['sm61loggedin']) && $_SESSION['sm61loggedin'] === true) { ?>
 <hr style="margin-top:30px;">
 <div id="bottom_cron_section" style="margin-top:20px;">
-<br>
+
 
 <!-- Piper TTS Section - MOVED TO TOP -->
 <h3>Generate Announcement with Piper TTS</h3>
@@ -16,7 +16,7 @@
 <br><br>
 <button id="generate_tts" class="submit">Generate WAV File</button>
 <div id="tts_status" style="margin-top:10px; font-weight:bold; color:#28a745;"></div>
-<br><br>
+<h3>Announcement Scheduler</h3>
 
 <!-- MP3 Section -->
 <select id="mp3_select" class="submit" style="border:2px solid #444; width: 250px;">
