@@ -208,7 +208,7 @@ www-data ALL=(root) NOPASSWD: /usr/bin/crontab
 www-data ALL=(root) NOPASSWD: /etc/asterisk/local/audio_convert.sh
 www-data ALL=(ALL) NOPASSWD: /bin/cp, /bin/chown, /bin/chmod
 www-data ALL=(root) NOPASSWD: /usr/local/bin/piper_prompt_tts.sh
-www-data ALL=(root) NOPASSWD: /bin/rm /usr/local/share/asterisk/sounds/*.ul
+www-data ALL=(root) NOPASSWD: /bin/rm /usr/local/share/asterisk/sounds/announcements/*.ul
 EOF
     chmod 0440 "$SUDOERS_FILE"
     chown root:root "$SUDOERS_FILE"
