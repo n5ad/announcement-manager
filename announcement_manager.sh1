@@ -235,16 +235,8 @@ else
 fi
 
 # STEP 12. Download piper_generate.php and piper_prompt_tts.sh
-echo_step "12. Downloading piper_generate.php and piper_prompt_tts.sh"
-if [[ -f "$TARGET_DIR/piper_generate.php" ]]; then
-    echo "$TARGET_DIR/piper_generate.php already exists – skipping"
-else
-    sudo wget -O "$TARGET_DIR/piper_generate.php" \
-      https://raw.githubusercontent.com/n5ad/announcement-manager/main/piper_generate.php
-    sudo chown www-data:www-data "$TARGET_DIR/piper_generate.php"
-    sudo chmod 644 "$TARGET_DIR/piper_generate.php"
-    echo "piper_generate.php downloaded."
-fi
+echo_step "12. Downloading piper_prompt_tts.sh"
+
 
 if [[ -f "/usr/local/bin/piper_prompt_tts.sh" ]]; then
     echo "/usr/local/bin/piper_prompt_tts.sh already exists – skipping"
