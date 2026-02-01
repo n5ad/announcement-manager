@@ -34,15 +34,24 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 <br><br>
 
 <h3>Cron Manager</h3>
-<table id="cron_table" border="1" cellpadding="5" style="width:100%; border-collapse:collapse; font-size:0.95em;">
-    <thead style="background:#444;color:white;">
-        <tr>
-            <th>Min</th><th>Hour</th><th>DOM</th><th>Mon</th><th>DOW</th>
-            <th>File</th><th>Description</th><th>Enabled</th><th>Actions</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+<div style="overflow-x:auto; margin-top:10px;">
+    <table id="cron_table" style="width:100%; border-collapse:collapse; border:1px solid #666; font-size:0.95em;">
+        <thead style="background:#444;color:white;">
+            <tr>
+                <th style="padding:8px; border:1px solid #666; text-align:center;">Min</th>
+                <th style="padding:8px; border:1px solid #666; text-align:center;">Hour</th>
+                <th style="padding:8px; border:1px solid #666; text-align:center;">DOM</th>
+                <th style="padding:8px; border:1px solid #666; text-align:center;">Mon</th>
+                <th style="padding:8px; border:1px solid #666; text-align:center;">DOW</th>
+                <th style="padding:8px; border:1px solid #666; text-align:center;">File</th>
+                <th style="padding:8px; border:1px solid #666; text-align:center;">Description</th>
+                <th style="padding:8px; border:1px solid #666; text-align:center;">Enabled</th>
+                <th style="padding:8px; border:1px solid #666; text-align:center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
 
 </div>
 
@@ -66,34 +75,68 @@ $(document).ready(function() {
     }
     loadULDropdown();
 
+    // ====== Cron List with Separated Time Columns & Toggle (your working version) ======
     function loadCronList() {
         $.getJSON("/supermon/custom/list_cron.php", function(crons) {
-            let tbody = $("#cron_table tbody").empty();
-            $.each(crons, function(i, c) {
-                let parts = c.time.split(/\s+/);
+            let table = $("#cron_table tbody");
+            table.empty();
+            crons.forEach(function(c) {
                 let row = $("<tr>");
-                $.each(parts, function(j, p) { row.append($("<td>").text(p)); });
+                // Split time into separate columns
+                let timeParts = c.time.split(" ");
+                row.append($("<td>").text(timeParts[0] || "*")); // Minute
+                row.append($("<td>").text(timeParts[1] || "*")); // Hour
+                row.append($("<td>").text(timeParts[2] || "*")); // Day of Month
+                row.append($("<td>").text(timeParts[3] || "*")); // Month
+                row.append($("<td>").text(timeParts[4] || "*")); // Day of Week
                 row.append($("<td>").text(c.file));
                 row.append($("<td>").text(c.desc || ""));
-                let tog = $("<button>").text("Toggle").addClass("small-btn")
+                // Toggle Enabled/Disabled
+                let isEnabled = !c.raw.startsWith('#');
+                let toggleBtn = $("<button>")
+                    .text(isEnabled ? "Enabled" : "Disabled")
+                    .css({
+                        "background-color": isEnabled ? "#28a745" : "#dc3545",
+                        "color": "white",
+                        "border": "1px solid " + (isEnabled ? "#218838" : "#c82333"),
+                        "padding": "6px 12px",
+                        "cursor": "pointer",
+                        "border-radius": "4px",
+                        "font-weight": "bold"
+                    })
+                    .hover(
+                        function() { $(this).css("background-color", isEnabled ? "#218838" : "#c82333"); },
+                        function() { $(this).css("background-color", isEnabled ? "#28a745" : "#dc3545"); }
+                    )
                     .click(function() {
-                        let enable = confirm("Enable this cron job?") ? 1 : 0;
-                        $.post("/supermon/custom/toggle_cron.php", {raw_line: c.raw, enable: enable}, function(resp) {
-                            alert(resp);
+                        let $this = $(this);
+                        let newState = !isEnabled;
+                        let action = newState ? "enable" : "disable";
+                        if (!confirm(`Really ${action} "${c.file}"?`)) return;
+                        $this.prop("disabled", true).text("Updating…");
+                        $.post("/supermon/custom/toggle_cron.php", {
+                            raw_line: c.raw,
+                            enable: newState ? 1 : 0
+                        }, function(data) {
+                            alert(data);
                             loadCronList();
+                        }).fail(function() {
+                            alert("Toggle failed.");
+                        }).always(function() {
+                            $this.prop("disabled", false);
                         });
                     });
-                row.append($("<td>").append(tog));
+                row.append($("<td>").append(toggleBtn));
                 let acts = $("<td>");
                 $("<button>").text("Play").addClass("small-btn play").click(function(){
                     $.post("/supermon/custom/run_announcement.php", {file: c.file}, function(r){ alert(r); });
                 }).appendTo(acts);
                 $("<button>").text("Edit").addClass("small-btn edit").click(function(){
-                    let min = prompt("Minute", parts[0]); if(min===null)return;
-                    let hour = prompt("Hour", parts[1]); if(hour===null)return;
-                    let dom = prompt("Day", parts[2]); if(dom===null)return;
-                    let month = prompt("Month", parts[3]); if(month===null)return;
-                    let dow = prompt("DOW", parts[4]); if(dow===null)return;
+                    let min = prompt("Minute", timeParts[0]); if(min===null)return;
+                    let hour = prompt("Hour", timeParts[1]); if(hour===null)return;
+                    let dom = prompt("Day", timeParts[2]); if(dom===null)return;
+                    let month = prompt("Month", timeParts[3]); if(month===null)return;
+                    let dow = prompt("DOW", timeParts[4]); if(dow===null)return;
                     $.post("/supermon/custom/update_announcement.php", {
                         raw_line: c.raw, min, hour, dom, month, dow
                     }, function(resp){ alert(resp); loadCronList(); });
@@ -105,7 +148,7 @@ $(document).ready(function() {
                     });
                 }).appendTo(acts);
                 row.append(acts);
-                tbody.append(row);
+                table.append(row);
             });
         }).fail(function() { console.error("Failed to load cron list"); });
     }
@@ -151,7 +194,7 @@ $(document).ready(function() {
         });
     });
 
-    // NEW: Local Play for MP3/WAV (mirrors run_ul / play now behavior)
+    // Local Play for MP3/WAV
     $("#local_play_mp3").click(function() {
         let f = $("#mp3_select").val();
         if (!f) { 
@@ -165,30 +208,20 @@ $(document).ready(function() {
         });
     });
 
-    // Global Play for MP3/WAV with warning confirmation
+    // Global Play for MP3/WAV with warning
     $("#global_play_mp3").click(function() {
-        let btn = $(this);
-        if (btn.prop('disabled')) return;
-        btn.prop('disabled', true).text("Playing...");
-
         let f = $("#mp3_select").val();
-        if (!f) {
-            alert("Select an MP3/WAV file first");
-            btn.prop('disabled', false).text("Global Play");
-            return;
+        if (!f) { 
+            alert("Select an MP3/WAV file first"); 
+            return; 
         }
-
         if (!confirm("WARNING: This announcement will play on this node AND all currently linked nodes.\n\nContinue?")) {
-            btn.prop('disabled', false).text("Global Play");
             return;
         }
-
-        $.post("/supermon/custom/globalplay.php", {file: f}, function(r){
-            alert(r);
+        $.post("/supermon/custom/globalplay.php", {file: f}, function(r){ 
+            alert(r); 
         }).fail(function() {
             alert("Global play request failed - check server logs or permissions.");
-        }).always(function() {
-            btn.prop('disabled', false).text("Global Play");
         });
     });
 
@@ -237,4 +270,33 @@ $(document).ready(function() {
     .submit { padding:6px 12px; margin:4px; }
     #local_play_mp3:hover { opacity:0.85; }
     #global_play_mp3:hover { opacity:0.85; }
+
+    /* Grid appearance for cron table - strong cell separation */
+    #cron_table th, #cron_table td {
+        border: 1px solid #666;      /* Visible border around EVERY cell */
+        padding: 8px 10px;           /* Space inside cells for clear separation */
+        text-align: center;
+    }
+
+    #cron_table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;   /* Light zebra stripe */
+    }
+
+    #cron_table tbody tr:hover {
+        background-color: #f0f8ff;   /* Subtle row hover */
+    }
+
+    /* Prevent wrapping in narrow columns */
+    #cron_table td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+    }
+
+    /* Actions column can wrap buttons */
+    #cron_table td:last-child {
+        white-space: normal;
+        max-width: none;
+    }
 </style>
