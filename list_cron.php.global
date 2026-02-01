@@ -2,8 +2,9 @@
 /*
  * list_cron.php
  * Lists AllStar announcement cron jobs with time, file, description, and scope (Local/Global)
- * CREATED BY N5AD - updated to support global play
+ * Updated by N5AD - now supports both playaudio.sh (Local) and playglobal.sh (Global)
  */
+
 header('Content-Type: application/json');
 
 // Read root crontab
@@ -21,37 +22,31 @@ foreach ($lines as $line) {
     $line = trim($line);
     if ($line === "") continue;
 
-    // Capture announcement description (may contain [LOCAL] or [GLOBAL])
+    // Capture announcement description and detect scope from comment if present
     if (strpos($line, '# Announcement:') === 0) {
         $last_comment = trim(str_replace('# Announcement:', '', $line));
         continue;
     }
 
-    // Match lines with either playaudio.sh or playglobal.sh
+    // Match both local and global play scripts
     if (strpos($line, 'playaudio.sh') !== false || strpos($line, 'playglobal.sh') !== false) {
         $parts = preg_split('/\s+/', $line);
 
-        // First 5 fields = cron time
+        // First 5 fields are cron timing
         $time = implode(" ", array_slice($parts, 0, 5));
 
-        // Last part = sound file path (no extension)
+        // Last part is the sound file path (no extension)
         $file = basename(end($parts));
 
-        // Determine scope
-        $script_name = end($parts); // full path to script
+        // Determine scope: prefer comment tag [GLOBAL]/[LOCAL], fallback to script name
         $scope = "Local"; // default
 
-        // Prefer scope from comment tag [GLOBAL] or [LOCAL]
         if (stripos($last_comment, '[GLOBAL]') !== false) {
             $scope = "Global";
         } elseif (stripos($last_comment, '[LOCAL]') !== false) {
             $scope = "Local";
-        }
-        // Fallback: check which script is used
-        elseif (strpos($script_name, 'playglobal.sh') !== false) {
+        } elseif (strpos($line, 'playglobal.sh') !== false) {
             $scope = "Global";
-        } elseif (strpos($script_name, 'playaudio.sh') !== false) {
-            $scope = "Local";
         }
 
         $entries[] = [
@@ -59,10 +54,10 @@ foreach ($lines as $line) {
             "file"  => $file,
             "desc"  => $last_comment,
             "raw"   => $line,
-            "scope" => $scope   // NEW: "Local" or "Global"
+            "scope" => $scope   // NEW: Local or Global
         ];
 
-        // Reset comment so it applies only to this entry
+        // Reset comment so it only applies to the current entry
         $last_comment = "";
     }
 }
