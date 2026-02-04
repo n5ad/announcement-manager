@@ -317,20 +317,20 @@ else
     sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
     sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
 
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/joe/medium/en_US-lessac-medium.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/joe/medium/en_US-lessac-medium.onnx.json
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/joe/medium/en_US-joe-medium.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/joe/medium/en_US-joe-medium.onnx.json
 
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-lessac-medium.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-lessac-medium.onnx.json
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx.json
 
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/kristin/medium/en_US-lessac-medium.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/kristin/medium/en_US-lessac-medium.onnx.json
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/kristin/medium/en_US-kristin-medium.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/kristin/medium/en_US-kristin-medium.onnx.json
 
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/librits_r/medium/en_US-lessac-medium.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/librits_r/medium/en_US-lessac-medium.onnx.json
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/librits_r/medium/en_US-librits_r-medium.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/librits_r/medium/en_US-librits_r-medium.onnx.json
 
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/medium/en_US-lessac-high.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/medium/en_US-lessac-high.onnx.json
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/medium/en_US-ryan-high.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/medium/en_US-ryan-high.onnx.json
 
 
     sudo chown www-data:www-data *.onnx *.onnx.json
