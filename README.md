@@ -17,7 +17,7 @@ sudo wget https://raw.githubusercontent.com/KD5FMU/announcement-manager/refs/hea
 ```
 Then lets make that script file executable
 ```
-sudo chmod +x annoucement_manager.sh
+sudo chmod +x announcement_manager.sh
 ```
 Node we can execute the installer script and start the magic
 ```
