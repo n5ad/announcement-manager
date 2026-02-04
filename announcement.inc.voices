@@ -31,7 +31,7 @@
 
 <!-- NEW: Voice dropdown (added here, no layout change) -->
 
-<label for="tts_voice">Voice:</label>
+<label for="tts_voice">Please select your voice model:</label>
 
 <select id="tts_voice" class="submit" style="width: 250px;">
 
