@@ -36,13 +36,15 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
     <option value="/opt/piper/voices/en_US-lessac-medium.onnx">Lessac (Medium, American female)</option>
 
-    <option value="/opt/piper/voices/en_US-arctic-medium.onnx">Arctic (Medium, American female)</option>
+    <option value="/opt/piper/voices/en_US-joe-medium.onnx">Joe (Medium, American male)</option>
 
     <option value="/opt/piper/voices/en_US-amy-medium.onnx">Amy (Medium, American female)</option>
 
-    <option value="/opt/piper/voices/en_US-ryan-medium.onnx">Ryan (Medium, American male)</option>
+    <option value="/opt/piper/voices/en_US-kristin-medium.onnx">Kristin (Medium, American female)</option>
 
-    <option value="/opt/piper/voices/en_GB-alan-low.onnx">Alan (Medium, British male)</option>
+    <option value="/opt/piper/voices/en_US-librits_r-medium.onnx">Librits_r (Medium, British female)</option>
+    
+    <option value="/opt/piper/voices/en_US-ryan-medium.onnx">Ryan (Medium, British female)</option>
 
     <!-- Add more here as you download them -->
 
