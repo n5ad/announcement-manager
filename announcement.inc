@@ -43,9 +43,9 @@
 
     <option value="/opt/piper/voices/en_US-kristin-medium.onnx">Kristin (Medium, American female)</option>
 
-    <option value="/opt/piper/voices/en_US-librits_r-medium.onnx">Librits_r (Medium, British female)</option>
+    <option value="/opt/piper/voices/en_US-libritts_r-medium.onnx">Libritts_r (Medium, British female)</option>
     
-    <option value="/opt/piper/voices/en_US-ryan-medium.onnx">Ryan (Medium, British female)</option>
+    <option value="/opt/piper/voices/en_US-ryan-high.onnx">Ryan (High, British female)</option>
 
     <!-- Add more here as you download them -->
 
