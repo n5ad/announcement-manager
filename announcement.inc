@@ -18,7 +18,7 @@
 
 <h3>Generate Announcement with Piper TTS</h3>
 
-<textarea id="tts_text" rows="4" cols="60" placeholder="Enter the text you want to convert to speech..."></textarea>
+<textarea id="tts_text" rows="4" cols="60" placeholder="Enter the text you want to convert to speech. Commas and periods are acceptable, no other punctuation is allowed..."></textarea>
 
 <br><br>
 
