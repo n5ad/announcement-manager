@@ -266,11 +266,12 @@ $(document).ready(function() {
         let mp3 = $("#mp3_select").val();
         if (!mp3) { alert("Please select an MP3 file."); return; }
 
-        let min   = prompt("Minute:", "45"); if (min === null) return;
-        let hour  = prompt("Hour:", "7-20"); if (hour === null) return;
-        let dom   = prompt("DOM:", "*"); if (dom === null) return;
-        let month = prompt("Month:", "*"); if (month === null) return;
-        let dow   = prompt("DOW: (1-7 for nth-week mode)", "*"); if (dow === null) return;
+        let min = prompt("Minute:Which minute of the hour do you want this to play?", "45"); if(min===null) return;
+        let hour = prompt("Hour:Which hour or range of hours do you want this to play? \n * = every hour \n single= 12 \n selected= 6,10,16 \n range= 7-20 \n every 2 hours between selected = 7-19/2", "7-20"); if(hour===null) return;
+        let dom = prompt("DOM:Which day or range of days do you want this to play? \n* = everyday \n 1-31 \n selected= 1,7,23 \n range= 12-18", "*"); if(dom===null) return;
+        let month = prompt("Month:Which Months do you want this to play? \n* = every month \n Jan = 1 Dec = 12", "*"); if(month===null) return;
+        let dow = prompt("DOW: Which Day or days of the week do you want this to play? \n* = every day \n Sun=1 Sat=7 \nor range/list\n\nSingle number 1-7 = nth-week scheduling", "*");
+        if(dow===null) return;
 
         let week = "*";
         let useNth = false;
