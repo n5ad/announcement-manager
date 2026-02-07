@@ -4,25 +4,18 @@
 // Include this file in Allmon3 after successful login
 // added advanced cronjob creation using logic like 2nd monday of the month
 // created by N5AD February 2026
-
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     return;
 }
 ?>
-
 <hr style="margin-top:30px;">
-
 <div id="bottom_cron_section" style="margin-top:20px;">
-
 <h3>Generate Announcement with Piper TTS</h3>
-
 <textarea id="tts_text" rows="4" cols="60" placeholder="Enter the text you want to convert to speech. Commas and periods are acceptable, no other punctuation is allowed..."></textarea>
 <br><br>
-
 <label for="tts_filename">Filename (one word, letters/numbers/hyphen/underscore only, no extension):</label>
 <br>
 <input type="text" id="tts_filename" placeholder="e.g. morningnet" style="width:220px;">
-
 <!-- Voice selection dropdown -->
 <label for="tts_voice">Please select your voice model:</label>
 <select id="tts_voice" class="submit" style="width: 250px;">
@@ -34,32 +27,24 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     <option value="/opt/piper/voices/en_US-ryan-high.onnx">Ryan (High, British female)</option>
     <!-- Add more here as you download them -->
 </select>
-
 <button id="generate_tts" class="submit">Generate WAV File</button>
 <div id="tts_status" style="margin-top:10px; font-weight:bold; color:#28a745;"></div>
-
 <h3>Announcement Scheduler</h3>
-
 <select id="mp3_select" class="submit" style="border:2px solid #444; width: 280px;">
     <option value="">-- Select Audio File (MP3 or WAV) --</option>
 </select>
-
 <input type="button" class="submit" value="Install Announcement" id="install_announcement">
 <input type="button" class="submit" value="Delete MP3/WAV" id="delete_mp3" style="background:#dc3545;color:white;border:1px solid #c82333;">
 <input type="button" class="submit" value="Local Play" id="local_play_mp3" style="background:#28a745;color:white;border:1px solid #1e7e34;">
 <input type="button" class="submit" value="Global Play" id="global_play_mp3" style="background:#fd7e14;color:white;border:1px solid #e06b00;">
 <br><br>
-
 <select id="ul_select" class="submit" style="border:2px solid #444; width: 280px;">
     <option value="">-- Select .ul Announcement --</option>
 </select>
-
 <input type="button" class="submit" value="Play Now" id="run_ul">
 <input type="button" class="submit" value="Delete .ul" id="delete_ul" style="background:#dc3545;color:white;border:1px solid #c82333;">
 <br><br>
-
 <h3>Cron Manager</h3>
-
 <div style="overflow-x:auto; margin-top:10px;">
     <table id="cron_table" style="width:100%; border-collapse:collapse; border:1px solid #666; font-size:0.95em;">
         <thead style="background:#444;color:white;">
@@ -78,14 +63,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         <tbody></tbody>
     </table>
 </div>
-
 </div>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-
 $(document).ready(function() {
-
     function loadMP3Dropdown() {
         $.getJSON("/supermon/custom/list_mp3.php", function(files) {
             $("#mp3_select").empty().append($("<option>").val("").text("-- Select Audio File (MP3/WAV) --"));
@@ -93,7 +74,6 @@ $(document).ready(function() {
         }).fail(function() { console.error("Failed to load MP3 list"); });
     }
     loadMP3Dropdown();
-
     function loadULDropdown() {
         $.getJSON("/supermon/custom/list_ul.php", function(files) {
             $("#ul_select").empty().append($("<option>").val("").text("-- Select .ul Announcement --"));
@@ -101,7 +81,6 @@ $(document).ready(function() {
         }).fail(function() { console.error("Failed to load UL list"); });
     }
     loadULDropdown();
-
     // Delete MP3/WAV
     $("#delete_mp3").click(function() {
         let f = $("#mp3_select").val();
@@ -111,7 +90,6 @@ $(document).ready(function() {
             loadMP3Dropdown();
         });
     });
-
     // Local Play for MP3/WAV
     $("#local_play_mp3").click(function() {
         let f = $("#mp3_select").val();
@@ -119,7 +97,7 @@ $(document).ready(function() {
             alert("Select an MP3/WAV file first");
             return;
         }
-        $.post("/supermon/custom/run_announcement.php", { 
+        $.post("/supermon/custom/run_announcement.php", {
             file: f,
             source: "mp3"
         }, function(r){ alert(r); })
@@ -127,7 +105,6 @@ $(document).ready(function() {
             alert("Local play request failed - check server logs or permissions.");
         });
     });
-
     // Global Play for MP3/WAV
     $("#global_play_mp3").click(function() {
         let f = $("#mp3_select").val();
@@ -138,7 +115,7 @@ $(document).ready(function() {
         if (!confirm("WARNING: This announcement will play on this node AND all currently linked nodes.\n\nContinue?")) {
             return;
         }
-        $.post("/supermon/custom/globalplay.php", { 
+        $.post("/supermon/custom/globalplay.php", {
             file: f,
             source: "mp3"
         }, function(r){ alert(r); })
@@ -146,12 +123,11 @@ $(document).ready(function() {
             alert("Global play request failed - check server logs or permissions.");
         });
     });
-
     // Play Now for UL files
     $("#run_ul").click(function() {
         let f = $("#ul_select").val();
         if (!f) { alert("Select announcement first"); return; }
-        $.post("/supermon/custom/run_announcement.php", { 
+        $.post("/supermon/custom/run_announcement.php", {
             file: f,
             source: "ul"
         }, function(r){ alert(r); })
@@ -159,7 +135,6 @@ $(document).ready(function() {
             alert("Play Now failed - check server logs or permissions.");
         });
     });
-
     // Delete .ul
     $("#delete_ul").click(function() {
         let f = $("#ul_select").val();
@@ -169,32 +144,26 @@ $(document).ready(function() {
             loadULDropdown();
         });
     });
-
     // Generate TTS
     $("#generate_tts").click(function() {
-        let text  = $("#tts_text").val().trim();
-        let fn    = $("#tts_filename").val().trim();
+        let text = $("#tts_text").val().trim();
+        let fn = $("#tts_filename").val().trim();
         let voice = $("#tts_voice").val();
-
         if (!text || !fn) {
             alert("Text and filename are required");
             return;
         }
-
         if (!/^[a-zA-Z0-9_-]+$/.test(fn)) {
             alert("Filename: letters, numbers, hyphen or underscore only (no spaces or special characters)");
             return;
         }
-
         if (!voice) {
             alert("Please select a voice model");
             return;
         }
-
         $("#tts_status")
             .text("Generating WAV... Please wait")
             .css("color", "#28a745");
-
         $.post("/supermon/custom/piper_generate.php", {
             text: text,
             filename: fn,
@@ -202,7 +171,6 @@ $(document).ready(function() {
         })
         .done(function(resp) {
             $("#tts_status").text(resp);
-
             if (resp.toLowerCase().includes("success") || resp.toLowerCase().includes("generated")) {
                 $("#tts_text").val("");
                 $("#tts_filename").val("");
@@ -220,7 +188,6 @@ $(document).ready(function() {
                 .css("color", "#dc3545");
         });
     });
-
     // Load Cron List + Edit button with warning for advanced jobs
     function loadCronList() {
         $.getJSON("/supermon/custom/list_cron.php", function(crons) {
@@ -236,9 +203,8 @@ $(document).ready(function() {
                 row.append($("<td>").text(timeParts[4] || "*"));
                 row.append($("<td>").text(c.file));
                 row.append($("<td>").text(c.desc || ""));
-                
+               
                 let isEnabled = !c.raw.startsWith('#');
-
                 let toggleBtn = $("<button>")
                     .text(isEnabled ? "Enabled" : "Disabled")
                     .css({
@@ -255,7 +221,7 @@ $(document).ready(function() {
                         let newState = !isEnabled;
                         let action = newState ? "enable" : "disable";
                         if (!confirm(`Really ${action} "${c.file}"?`)) return;
-                        $this.prop("disabled", true).text("Updating…");
+                        $this.prop("disabled", true).text("Updatingâ€¦");
                         $.post("/supermon/custom/toggle_cron.php", {
                             raw_line: c.raw,
                             enable: newState ? 1 : 0
@@ -268,31 +234,27 @@ $(document).ready(function() {
                             $this.prop("disabled", false);
                         });
                     });
-
+                row.append($("<td>").append(toggleBtn)); // Separate cell for Enabled
+                
                 let acts = $("<td>").css("white-space", "nowrap");
-                acts.append(toggleBtn);
-
                 let playBtn = $("<button>").text("Play Now").addClass("small-btn play").click(function(){
                     if(!confirm("Play "+c.file+" now?")) return;
                     $.post("/supermon/custom/run_announcement.php", {file: c.file}, function(r){
                         alert(r);
                     });
                 }).appendTo(acts);
-
                 // Edit button - shows warning for advanced/nth-week jobs
                 let editBtn = $("<button>").text("Edit").addClass("small-btn edit").click(function(){
                     // Detect advanced/nth-week job with reliable pattern
-                    let isNthJob = c.raw.includes("/bin/bash -c") && 
-                                   c.raw.includes("date +\\%d") && 
+                    let isNthJob = c.raw.includes("/bin/bash -c") &&
+                                   c.raw.includes("date +\\%d") &&
                                    c.raw.includes("playaudio.sh");
-
                     if (isNthJob) {
                         alert("Editing is not available for advanced/nth-week scheduled cron jobs.\n\n" +
                               "These jobs use special logic (e.g. '2nd Monday of the month').\n" +
                               "To change this job, please delete it and create a new one.");
                         return; // STOP - no edit prompts, no save
                     }
-
                     // Normal edit only for classic jobs
                     let parts = c.time.split(" ");
                     let min = prompt("Minute:", parts[0]); if(min===null) return;
@@ -300,27 +262,23 @@ $(document).ready(function() {
                     let dom = prompt("DOM:", parts[2]); if(dom===null) return;
                     let month = prompt("Month:", parts[3]); if(month===null) return;
                     let dow = prompt("DOW:", parts[4]); if(dow===null) return;
-
                     $.post("/supermon/custom/update_announcement.php", {
                         raw_line: c.raw,
                         min, hour, dom, month, dow
                     }, function(resp){ alert(resp); loadCronList(); });
                 }).appendTo(acts);
-
                 $("<button>").text("Delete").addClass("small-btn del").click(function(){
                     if(!confirm("Delete cron for "+c.file+"?")) return;
                     $.post("/supermon/custom/delete_announcement.php", {raw_line: c.raw}, function(r){
                         alert(r); loadCronList();
                     });
                 }).appendTo(acts);
-
                 row.append(acts);
                 table.append(row);
             });
         }).fail(function() { console.error("Failed to load cron list"); });
     }
     loadCronList();
-
     // Install Announcement
     $("#install_announcement").click(function() {
         let mp3 = $("#mp3_select").val();
@@ -362,7 +320,6 @@ $(document).ready(function() {
             alert("Install failed.");
         });
     });
-
     // Delete MP3/WAV
     $("#delete_mp3").click(function() {
         let f = $("#mp3_select").val();
@@ -372,7 +329,6 @@ $(document).ready(function() {
             loadMP3Dropdown();
         });
     });
-
     // Local Play for MP3/WAV
     $("#local_play_mp3").click(function() {
         let f = $("#mp3_select").val();
@@ -380,7 +336,7 @@ $(document).ready(function() {
             alert("Select an MP3/WAV file first");
             return;
         }
-        $.post("/supermon/custom/run_announcement.php", { 
+        $.post("/supermon/custom/run_announcement.php", {
             file: f,
             source: "mp3"
         }, function(r){ alert(r); })
@@ -388,7 +344,6 @@ $(document).ready(function() {
             alert("Local play request failed - check server logs or permissions.");
         });
     });
-
     // Global Play for MP3/WAV
     $("#global_play_mp3").click(function() {
         let f = $("#mp3_select").val();
@@ -399,7 +354,7 @@ $(document).ready(function() {
         if (!confirm("WARNING: This announcement will play on this node AND all currently linked nodes.\n\nContinue?")) {
             return;
         }
-        $.post("/supermon/custom/globalplay.php", { 
+        $.post("/supermon/custom/globalplay.php", {
             file: f,
             source: "mp3"
         }, function(r){ alert(r); })
@@ -407,12 +362,11 @@ $(document).ready(function() {
             alert("Global play request failed - check server logs or permissions.");
         });
     });
-
     // Play Now for UL files
     $("#run_ul").click(function() {
         let f = $("#ul_select").val();
         if (!f) { alert("Select announcement first"); return; }
-        $.post("/supermon/custom/run_announcement.php", { 
+        $.post("/supermon/custom/run_announcement.php", {
             file: f,
             source: "ul"
         }, function(r){ alert(r); })
@@ -420,7 +374,6 @@ $(document).ready(function() {
             alert("Play Now failed - check server logs or permissions.");
         });
     });
-
     // Delete .ul
     $("#delete_ul").click(function() {
         let f = $("#ul_select").val();
@@ -430,32 +383,26 @@ $(document).ready(function() {
             loadULDropdown();
         });
     });
-
     // Generate TTS
     $("#generate_tts").click(function() {
-        let text  = $("#tts_text").val().trim();
-        let fn    = $("#tts_filename").val().trim();
+        let text = $("#tts_text").val().trim();
+        let fn = $("#tts_filename").val().trim();
         let voice = $("#tts_voice").val();
-
         if (!text || !fn) {
             alert("Text and filename are required");
             return;
         }
-
         if (!/^[a-zA-Z0-9_-]+$/.test(fn)) {
             alert("Filename: letters, numbers, hyphen or underscore only (no spaces or special characters)");
             return;
         }
-
         if (!voice) {
             alert("Please select a voice model");
             return;
         }
-
         $("#tts_status")
             .text("Generating WAV... Please wait")
             .css("color", "#28a745");
-
         $.post("/supermon/custom/piper_generate.php", {
             text: text,
             filename: fn,
@@ -463,7 +410,6 @@ $(document).ready(function() {
         })
         .done(function(resp) {
             $("#tts_status").text(resp);
-
             if (resp.toLowerCase().includes("success") || resp.toLowerCase().includes("generated")) {
                 $("#tts_text").val("");
                 $("#tts_filename").val("");
@@ -481,11 +427,8 @@ $(document).ready(function() {
                 .css("color", "#dc3545");
         });
     });
-
 });
-
 </script>
-
 <style>
     .small-btn { font-size:0.9em; padding:4px 8px; margin:0 3px; cursor:pointer; }
     .play { background:#17a2b8; color:white; border:none; }
@@ -515,5 +458,4 @@ $(document).ready(function() {
         max-width: none;
     }
 </style>
-
 <?php } ?></div>
