@@ -1,174 +1,130 @@
 <?php
 
 /**
-
  * announcement.php
-
  * Created by N5AD
-
  * Converts MP3 → u-law (.ul), copies to Asterisk sounds dir,
-
- * and optionally installs a cron job.
-
+ * and installs a cron job (classic or nth-week style)
  */
 
-
-$TMP_DIR = '/mp3';
-
+$TMP_DIR      = '/mp3';
 $CONVERT_SCRIPT = '/etc/asterisk/local/audio_convert.sh';
-
-$PLAY_SCRIPT = '/etc/asterisk/local/playaudio.sh';
-
-$SOUNDS_DIR = '/usr/local/share/asterisk/sounds/announcements';
-
+$PLAY_SCRIPT  = '/etc/asterisk/local/playaudio.sh';
+$SOUNDS_DIR   = '/usr/local/share/asterisk/sounds/announcements';
 
 // Get POST variables
-
-$mp3 = isset($_POST['file']) ? basename($_POST['file']) : '';
-
-$min = $_POST['min'] ?? '';
-
-$hour = $_POST['hour'] ?? '';
-
-$dom = $_POST['dom'] ?? '';
-
-$month = $_POST['month'] ?? '';
-
-$dow = $_POST['dow'] ?? '';
-
-$desc = $_POST['desc'] ?? '';
-
+$mp3    = isset($_POST['file'])   ? basename($_POST['file']) : '';
+$min    = $_POST['min']   ?? '';
+$hour   = $_POST['hour']  ?? '';
+$dom    = $_POST['dom']   ?? '';
+$month  = $_POST['month'] ?? '';
+$dow    = $_POST['dow']   ?? '';
+$week   = $_POST['week']  ?? '*';
+$use_nth = !empty($_POST['use_nth']) && $_POST['use_nth'] == 1;
+$desc   = $_POST['desc']  ?? '';
 
 if (!$mp3) {
-
     die("No MP3 file specified.");
-
 }
-
 
 // Validate MP3 file exists
-
 $src_mp3 = "$TMP_DIR/$mp3";
-
 if (!file_exists($src_mp3)) {
-
     die("MP3 file not found: $src_mp3");
-
 }
 
-
-// Validate converter script exists
-
+// Validate converter script exists and is executable
 if (!is_executable($CONVERT_SCRIPT)) {
-
     die("Conversion script not found or not executable: $CONVERT_SCRIPT");
-
 }
-
 
 // Run conversion
-
 $cmd_convert = escapeshellcmd("$CONVERT_SCRIPT $src_mp3");
-
 exec($cmd_convert, $output, $ret);
-
 if ($ret !== 0) {
-
     die("Conversion failed. Output: " . implode("\n", $output));
-
 }
-
 
 // Build .ul filename
-
 $base_name = pathinfo($mp3, PATHINFO_FILENAME);
-
-$ul_file = "$TMP_DIR/$base_name.ul";
-
+$ul_file   = "$TMP_DIR/$base_name.ul";
 
 // Check .ul was created
-
 if (!file_exists($ul_file)) {
-
     die("Conversion failed: $ul_file not found.");
-
 }
 
-
-// Copy .ul file to Asterisk sounds directory using sudo
-
+// Copy .ul file to Asterisk sounds directory
 $cmd_copy = escapeshellcmd("sudo cp $ul_file $SOUNDS_DIR/$base_name.ul");
-
 exec($cmd_copy, $copy_out, $copy_ret);
-
 if ($copy_ret !== 0) {
-
     die("Failed to copy $ul_file to $SOUNDS_DIR. Check sudo permissions.");
-
 }
 
-
-// Set permissions and ownership
-
+// Set proper permissions and ownership
 exec(escapeshellcmd("sudo chmod 644 $SOUNDS_DIR/$base_name.ul"));
-
 exec(escapeshellcmd("sudo chown root:root $SOUNDS_DIR/$base_name.ul"));
 
-
 // Install cron job if scheduling info provided
+if ($min !== '' && $hour !== '' && $dom !== '' && $month !== '' && $dow !== '') {
 
-if ($min && $hour && $dom && $month && $dow) {
+    $play_target = "$SOUNDS_DIR/$base_name";   // no extension for playaudio.sh
 
-    $play_target = "$SOUNDS_DIR/$base_name"; // NO extension for playaudio.sh
+    $desc_clean = $desc ? "# Announcement: $desc" : '';
 
+    if ($use_nth && in_array($week, ['1','2','3','4','5'])) {
+        // ── Nth week of the month ──────────────────────────────────────
+        $low  = ((int)$week - 1) * 7 + 1;
+        $high = ((int)$week === 5) ? 31 : $low + 6;
 
-    // Optional comment
+        // Only check day-of-month range — DOW is already in cron field
+        $cond = "[ \$(date +\\%d) -ge $low ] && [ \$(date +\\%d) -le $high ]";
 
-    $comment_line = $desc ? "# Announcement: $desc" : '';
+        $cron_line = "$min $hour * * $dow /bin/bash -c '$cond && $PLAY_SCRIPT $play_target'";
 
-
-    // Build cron line
-
-    $cron_line = "$min $hour $dom $month $dow $PLAY_SCRIPT $play_target";
-
-
-    // Append to root's crontab
-
-    $tmp_cron = tempnam(sys_get_temp_dir(), 'cron');
-
-    exec("sudo crontab -l > $tmp_cron 2>/dev/null"); // get current root crontab
-
-    if ($comment_line) {
-
-        file_put_contents($tmp_cron, $comment_line . PHP_EOL, FILE_APPEND);
-
+        // Improve description for visibility
+        $nth_suffix = ['','st','nd','rd','th','th'][(int)$week];
+        if ($desc_clean) {
+            $desc_clean .= " ({$week}{$nth_suffix} week of month - day $dow)";
+        }
+    } else {
+        // ── Classic / standard cron style ──────────────────────────────
+        $cron_line = "$min $hour $dom $month $dow $PLAY_SCRIPT $play_target";
     }
 
-    file_put_contents($tmp_cron, $cron_line . PHP_EOL, FILE_APPEND);
+    // Append to root's crontab
+    $tmp_cron = tempnam(sys_get_temp_dir(), 'cron_ann');
+    
+    // Get current crontab
+    exec("sudo crontab -l > " . escapeshellarg($tmp_cron) . " 2>/dev/null");
 
-    exec("sudo crontab $tmp_cron", $cron_out, $cron_ret);
+    // Add description comment if present
+    if ($desc_clean) {
+        file_put_contents($tmp_cron, $desc_clean . "\n", FILE_APPEND);
+    }
 
+    // Add the cron line
+    file_put_contents($tmp_cron, $cron_line . "\n", FILE_APPEND);
+
+    // Install new crontab
+    exec("sudo crontab " . escapeshellarg($tmp_cron), $cron_out, $cron_ret);
     unlink($tmp_cron);
 
-
     if ($cron_ret !== 0) {
-
-        die("Failed to install cron job.");
-
+        die("Failed to install cron job. Check sudo permissions.");
     }
 
     echo "Conversion and cron job installation successful!\n";
-
     echo "Cron line: $cron_line\n";
-
+    if ($use_nth) {
+        echo "Mode: Nth-week scheduling (week $week)\n";
+    } else {
+        echo "Mode: Standard scheduling\n";
+    }
 } else {
-
-    echo "Conversion successful! No cron job installed.\n";
-
+    echo "Conversion successful! No cron job installed (missing scheduling parameters).\n";
 }
-
 
 echo "UL file installed at: $SOUNDS_DIR/$base_name.ul\n";
 
 ?>
-

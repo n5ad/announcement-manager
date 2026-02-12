@@ -283,36 +283,6 @@ chown www-data:www-data "$LINK_PHP"
 chmod 644 "$LINK_PHP"
 echo "link.php permissions verified."
 
-# ────────────────────────────────────────────────
-# STEP 10.1 – Apply your preferred IPv4 LAN detection block
-# ────────────────────────────────────────────────
-echo_step "10.1. Applying your preferred IPv4 LAN detection"
-
-# Remove old if (empty($WANONLY)) block
-sed -i '/if (empty(\$WANONLY)) {/,/}/d' "$LINK_PHP"
-
-# Write your exact desired block to a temp file
-cat > /tmp/ip-block.txt << 'EOF'
-if (empty($WANONLY)) {
-   $myip = exec("$WGET -t 1 -T 3 -q -O- http://checkip.dyndns.org:8245 |$CUT -d':' -f2 |$CUT -d' ' -f2 |$CUT -d'<' -f1");
-   $WL=""; $mylanip = exec("ip -4 addr show scope global | awk '/inet/ {print $2}' | cut -d/ -f1 | head -1");
-
-EOF
-
-# Append it right after the $mgrport line (anchor point)
-sed -i "/\$mgrport = exec.*port = /r /tmp/ip-block.txt" "$LINK_PHP"
-
-# Clean up temp file
-rm -f /tmp/ip-block.txt
-
-# Optional: nicer label in printed line
-sed -i 's|\[ \$hostname \] \[ WAN:.*\] \[ .*LAN: \${mylanip} \]|[ $hostname ] [ WAN: ${myip} ] [ LAN: ${mylanip} ]|g' "$LINK_PHP"
-
-chown www-data:www-data "$LINK_PHP"
-chmod 644 "$LINK_PHP"
-
-echo "Preferred IPv4 LAN block inserted successfully."
-
 # STEP 11 Install custom index.html for Allmon3 web root
 echo_step "11 Installing custom index.html for Allmon3 (/usr/share/allmon3/)"
 
