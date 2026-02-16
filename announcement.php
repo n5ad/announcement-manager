@@ -52,7 +52,7 @@ if (!is_executable($CONVERT_SCRIPT)) {
 }
 
 // Run conversion
-$cmd_convert = escapeshellcmd("$CONVERT_SCRIPT $src_mp3");
+$cmd_convert = $CONVERT_SCRIPT . ' ' . escapeshellarg($src_mp3);
 exec($cmd_convert, $output, $ret);
 if ($ret !== 0) {
     die("Conversion failed. Output: " . implode("\n", $output));
@@ -68,15 +68,16 @@ if (!file_exists($ul_file)) {
 }
 
 // Copy .ul file to Asterisk sounds directory
-$cmd_copy = escapeshellcmd("sudo cp $ul_file $SOUNDS_DIR/$base_name.ul");
+$dest_ul = $SOUNDS_DIR . '/' . $base_name . '.ul';
+$cmd_copy = 'sudo cp ' . escapeshellarg($ul_file) . ' ' . escapeshellarg($dest_ul);
 exec($cmd_copy, $copy_out, $copy_ret);
 if ($copy_ret !== 0) {
     die("Failed to copy $ul_file to $SOUNDS_DIR. Check sudo permissions.");
 }
 
 // Set proper permissions and ownership
-exec(escapeshellcmd("sudo chmod 644 $SOUNDS_DIR/$base_name.ul"));
-exec(escapeshellcmd("sudo chown root:root $SOUNDS_DIR/$base_name.ul"));
+exec('sudo chmod 644 ' . escapeshellarg($dest_ul));
+exec('sudo chown root:root ' . escapeshellarg($dest_ul));
 
 // Install cron job if scheduling info provided
 if ($min !== '' && $hour !== '' && $dom !== '' && $month !== '' && $dow !== '') {

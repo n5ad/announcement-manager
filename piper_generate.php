@@ -47,17 +47,7 @@ $script = "/usr/local/bin/piper_prompt_tts.sh";
 
 // Build safe command with voice as third argument
 
-$cmd = escapeshellcmd(
-
-    "sudo $script " .
-
-    escapeshellarg($text) . " " .
-
-    escapeshellarg($filename) . " " .
-
-    escapeshellarg($voice)
-
-);
+$cmd = 'sudo ' . escapeshellarg($script) . ' ' . escapeshellarg($text) . ' ' . escapeshellarg($filename) . ' ' . escapeshellarg($voice);
 
 
 exec($cmd . " 2>&1", $output, $retval);

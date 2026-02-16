@@ -30,7 +30,7 @@ if (!is_executable($play_script)) {
     exit;
 }
 
-$cmd = escapeshellcmd("sudo $play_script $play_path");
+$cmd = 'sudo ' . escapeshellarg($play_script) . ' ' . escapeshellarg($play_path);
 
 exec($cmd . " 2>&1", $output, $retval);
 

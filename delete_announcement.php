@@ -53,7 +53,7 @@ while ($i < count($new_lines)) {
 $tempfile = tempnam(sys_get_temp_dir(), 'cron_clean_');
 file_put_contents($tempfile, implode(PHP_EOL, $final_lines) . PHP_EOL);
 
-exec("sudo crontab $tempfile");
+exec('sudo crontab ' . escapeshellarg($tempfile));
 unlink($tempfile);
 
 echo "Cron Entry deleted Successfully.";

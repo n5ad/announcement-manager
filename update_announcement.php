@@ -125,7 +125,7 @@ if (!$found) {
 $tempfile = tempnam(sys_get_temp_dir(), 'cron_update_');
 file_put_contents($tempfile, implode("\n", $new_crontab) . "\n");
 
-exec("sudo crontab $tempfile", $out, $ret);
+exec('sudo crontab ' . escapeshellarg($tempfile), $out, $ret);
 unlink($tempfile);
 
 if ($ret === 0) {

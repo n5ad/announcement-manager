@@ -49,8 +49,8 @@ if (!is_executable($play_script)) {
 }
 
 // Build and execute command
-$cmd = escapeshellcmd("sudo $play_script " . escapeshellarg($play_path));
-exec($cmd . " 2>&1", $output, $retval);
+$cmd = 'sudo ' . escapeshellarg($play_script) . ' ' . escapeshellarg($play_path);
+exec($cmd . ' 2>&1', $output, $retval);
 
 if ($retval === 0) {
     echo $echo_msg;
