@@ -30,13 +30,13 @@ if (isset($_COOKIE['display-data'])) {
     foreach ($_COOKIE['display-data'] as $name => $value) {
         $name = htmlspecialchars($name);
         switch ($name) {
-            case "number-displayed";
+            case "number-displayed":
                $Displayed_Nodes = htmlspecialchars($value);
                break;
-            case "show-number";
+            case "show-number":
                $Display_Count = htmlspecialchars($value);
                break;
-            case "show-all";
+            case "show-all":
                $Show_All = htmlspecialchars($value);
                break;
         }
