@@ -1,13 +1,13 @@
 <?php
 
 require_once __DIR__ . '/auth_check.inc';
+require_once __DIR__ . '/cron_helpers.inc';
 
-if (!isset($_POST['raw_line'])) {
-    echo "Error: Missing cron line";
+$raw = validate_raw_line($_POST['raw_line'] ?? null);
+if ($raw === null) {
+    echo "Error: Missing or invalid cron line";
     exit;
 }
-
-$raw = trim($_POST['raw_line']);
 
 // Get current crontab
 $output = [];

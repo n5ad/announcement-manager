@@ -7,6 +7,7 @@
  */
 
 require_once __DIR__ . '/auth_check.inc';
+require_once __DIR__ . '/cron_helpers.inc';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -14,17 +15,31 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$raw_line = trim($_POST['raw_line'] ?? '');
-$min      = trim($_POST['min']      ?? '');
-$hour     = trim($_POST['hour']     ?? '');
-$dom      = trim($_POST['dom']      ?? '');
-$month    = trim($_POST['month']    ?? '');
-$dow      = trim($_POST['dow']      ?? '');
-$week     = trim($_POST['week']     ?? '*');
+$raw_line = validate_raw_line($_POST['raw_line'] ?? null);
+$min      = trim((string)($_POST['min']      ?? ''));
+$hour     = trim((string)($_POST['hour']     ?? ''));
+$dom      = trim((string)($_POST['dom']      ?? ''));
+$month    = trim((string)($_POST['month']    ?? ''));
+$dow      = trim((string)($_POST['dow']      ?? ''));
+$week     = trim((string)($_POST['week']     ?? '*'));
 $use_nth  = !empty($_POST['use_nth']) && $_POST['use_nth'] == 1;
 
-if (!$raw_line || $min === '' || $hour === '' || $dom === '' || $month === '' || $dow === '') {
+if ($raw_line === null || $raw_line === '' || $min === '' || $hour === '' || $dom === '' || $month === '' || $dow === '') {
     echo "Missing required fields.";
+    exit;
+}
+
+$cron_field_pattern = '/^[\d*,\-\/\s]{1,50}$/';
+$validate_cron_field = static function ($val, $name) use ($cron_field_pattern) {
+    if ($val === '' || !preg_match($cron_field_pattern, $val)) {
+        return false;
+    }
+    return true;
+};
+if (!$validate_cron_field($min, 'min') || !$validate_cron_field($hour, 'hour')
+    || !$validate_cron_field($dom, 'dom') || !$validate_cron_field($month, 'month')
+    || !$validate_cron_field($dow, 'dow')) {
+    echo "Invalid cron field values.";
     exit;
 }
 

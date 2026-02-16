@@ -2,6 +2,7 @@
 // toggle_cron.php - Enable/Disable a cron job by commenting/uncommenting the line
 
 require_once __DIR__ . '/auth_check.inc';
+require_once __DIR__ . '/cron_helpers.inc';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -9,12 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-if (empty($_POST['raw_line']) || !isset($_POST['enable'])) {
+$raw_line = validate_raw_line($_POST['raw_line'] ?? null);
+if ($raw_line === null || !isset($_POST['enable'])) {
     echo "Missing parameters.";
     exit;
 }
-
-$raw_line = trim($_POST['raw_line']);
 $enable   = (bool)$_POST['enable'];  // true = uncomment (enable), false = comment (disable)
 
 // Read current crontab
