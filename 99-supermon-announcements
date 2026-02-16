@@ -1,6 +1,7 @@
 # /etc/sudoers.d/99-supermon-announcements
 # Supermon Announcements Manager - N5AD
 # Passwordless sudo for www-data to run required commands only
+# This file is managed by announcement_manager.sh - do not edit manually
 # Created/updated: January 2026
 
 # Allow running playaudio.sh (announcement playback)
@@ -12,6 +13,11 @@ www-data ALL=(root) NOPASSWD: /usr/bin/crontab
 # Allow running audio_convert.sh (MP3 to .ul conversion)
 www-data ALL=(root) NOPASSWD: /etc/asterisk/local/audio_convert.sh
 
-# NO OTHER COMMANDS ALLOWED - do NOT add /bin/cp, /bin/chown, /bin/chmod
-# These are dangerous if unrestricted
+# Required for copying .ul files to Asterisk sounds dir (announcement.php)
+www-data ALL=(ALL) NOPASSWD: /bin/cp, /bin/chown, /bin/chmod
+
+# Piper TTS (text-to-speech generation)
 www-data ALL=(root) NOPASSWD: /usr/local/bin/piper_prompt_tts.sh
+
+# Global playback (rpt playback to linked nodes)
+www-data ALL=(ALL) NOPASSWD: /etc/asterisk/local/playglobal.sh
