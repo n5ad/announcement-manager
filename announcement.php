@@ -16,14 +16,25 @@ $SOUNDS_DIR   = '/usr/local/share/asterisk/sounds/announcements';
 
 // Get POST variables
 $mp3    = isset($_POST['file'])   ? basename($_POST['file']) : '';
-$min    = $_POST['min']   ?? '';
-$hour   = $_POST['hour']  ?? '';
-$dom    = $_POST['dom']   ?? '';
-$month  = $_POST['month'] ?? '';
-$dow    = $_POST['dow']   ?? '';
-$week   = $_POST['week']  ?? '*';
+$min    = trim((string)($_POST['min']   ?? ''));
+$hour   = trim((string)($_POST['hour']  ?? ''));
+$dom    = trim((string)($_POST['dom']   ?? ''));
+$month  = trim((string)($_POST['month'] ?? ''));
+$dow    = trim((string)($_POST['dow']   ?? ''));
+$week   = trim((string)($_POST['week']  ?? '*'));
 $use_nth = !empty($_POST['use_nth']) && $_POST['use_nth'] == 1;
-$desc   = $_POST['desc']  ?? '';
+$desc   = (string)($_POST['desc'] ?? '');
+
+// Cron field validation: only allow digits, *, comma, hyphen, slash, spaces
+$cron_field_pattern = '/^[\d*,\-\/\s]{1,50}$/';
+$validate_cron_field = static function ($val, $name) use ($cron_field_pattern) {
+    if ($val === '' || !preg_match($cron_field_pattern, $val)) {
+        die("Invalid cron field: $name");
+    }
+};
+
+// Description: no newlines, max 200 chars, alphanumeric + basic punctuation
+$desc_clean = $desc ? preg_replace("/[^\x20-\x7E]/", '', substr($desc, 0, 200)) : '';
 
 if (!$mp3) {
     die("No MP3 file specified.");
@@ -70,11 +81,17 @@ exec(escapeshellcmd("sudo chown root:root $SOUNDS_DIR/$base_name.ul"));
 // Install cron job if scheduling info provided
 if ($min !== '' && $hour !== '' && $dom !== '' && $month !== '' && $dow !== '') {
 
+    $validate_cron_field($min, 'min');
+    $validate_cron_field($hour, 'hour');
+    $validate_cron_field($dom, 'dom');
+    $validate_cron_field($month, 'month');
+    $validate_cron_field($dow, 'dow');
+
     $play_target = "$SOUNDS_DIR/$base_name";   // no extension for playaudio.sh
 
-    $desc_clean = $desc ? "# Announcement: $desc" : '';
+    $desc_line = $desc_clean !== '' ? "# Announcement: $desc_clean" : '';
 
-    if ($use_nth && in_array($week, ['1','2','3','4','5'])) {
+    if ($use_nth && in_array($week, ['1','2','3','4','5']) && preg_match('/^[1-7]$/', $dow)) {
         // ── Nth week of the month ──────────────────────────────────────
         $low  = ((int)$week - 1) * 7 + 1;
         $high = ((int)$week === 5) ? 31 : $low + 6;
@@ -86,8 +103,8 @@ if ($min !== '' && $hour !== '' && $dom !== '' && $month !== '' && $dow !== '') 
 
         // Improve description for visibility
         $nth_suffix = ['','st','nd','rd','th','th'][(int)$week];
-        if ($desc_clean) {
-            $desc_clean .= " ({$week}{$nth_suffix} week of month - day $dow)";
+        if ($desc_line !== '') {
+            $desc_line .= " ({$week}{$nth_suffix} week of month - day $dow)";
         }
     } else {
         // ── Classic / standard cron style ──────────────────────────────
@@ -101,8 +118,8 @@ if ($min !== '' && $hour !== '' && $dom !== '' && $month !== '' && $dow !== '') 
     exec("sudo crontab -l > " . escapeshellarg($tmp_cron) . " 2>/dev/null");
 
     // Add description comment if present
-    if ($desc_clean) {
-        file_put_contents($tmp_cron, $desc_clean . "\n", FILE_APPEND);
+    if ($desc_line !== '') {
+        file_put_contents($tmp_cron, $desc_line . "\n", FILE_APPEND);
     }
 
     // Add the cron line
