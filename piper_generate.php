@@ -34,13 +34,17 @@ if (!$text || !$filename) {
 
 
 // Default voice if none selected
-
 if (empty($voice)) {
-
     $voice = "/opt/piper/voices/en_US-lessac-medium.onnx";
-
 }
 
+// Validate voice path is under /opt/piper/voices/ and exists
+$voices_dir = '/opt/piper/voices';
+$voice_real = realpath($voice);
+if ($voice_real === false || strpos($voice_real, $voices_dir) !== 0 || !preg_match('/\.onnx$/i', $voice)) {
+    echo "Invalid voice path.";
+    exit;
+}
 
 $script = "/usr/local/bin/piper_prompt_tts.sh";
 
