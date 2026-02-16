@@ -37,9 +37,7 @@ sort($files);
 
 
 // Remove duplicates (in case someone has both .mp3 and .wav with same base name)
-
-$files = array_unique($files);
-
+$files = array_values(array_unique($files));
 
 header('Content-Type: application/json');
 
