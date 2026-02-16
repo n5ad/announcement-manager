@@ -1,15 +1,12 @@
 <?php
 
 /**
-
  * list_mp3.php
-
  * Lists both .mp3 and .wav files in /mp3/ for the Announcements Manager
-
  * CREATED BY N5AD
-
  */
 
+require_once __DIR__ . '/auth_check.inc';
 
 $files = [];
 

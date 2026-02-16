@@ -5,6 +5,8 @@
  * CREATED BY N5AD
  */
 
+require_once __DIR__ . '/auth_check.inc';
+
 header('Content-Type: application/json');
 
 // Read root crontab

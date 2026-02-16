@@ -8,6 +8,8 @@
  * Original by N5AD - updated to support MP3/WAV directly
  */
 
+require_once __DIR__ . '/auth_check.inc';
+
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

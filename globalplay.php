@@ -1,6 +1,8 @@
 <?php
 // allmon-globalplay.php - Global playback using playglobal.sh (rpt playback)
 
+require_once __DIR__ . '/auth_check.inc';
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo "Method not allowed.";

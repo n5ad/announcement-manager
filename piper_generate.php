@@ -4,6 +4,7 @@
 
 // Now supports voice selection from dropdown
 
+require_once __DIR__ . '/auth_check.inc';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 

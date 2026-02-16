@@ -6,6 +6,8 @@
  * created by N5AD February 2026
  */
 
+require_once __DIR__ . '/auth_check.inc';
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo "Method not allowed.";

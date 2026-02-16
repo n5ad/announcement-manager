@@ -7,6 +7,8 @@
  * and installs a cron job (classic or nth-week style)
  */
 
+require_once __DIR__ . '/auth_check.inc';
+
 $TMP_DIR      = '/mp3';
 $CONVERT_SCRIPT = '/etc/asterisk/local/audio_convert.sh';
 $PLAY_SCRIPT  = '/etc/asterisk/local/playaudio.sh';

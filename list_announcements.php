@@ -1,23 +1,13 @@
 <?php
 
 /**
-
  * list_announcements.php
-
- *
-
  * Lists AllStar announcement cron jobs created via Supermon
-
- * Identified by comments beginning with:
-
- *   # Announcement:
-
- *
-
+ * Identified by comments beginning with: # Announcement:
  * CREATED BY N5AD
-
  */
 
+require_once __DIR__ . '/auth_check.inc';
 
 header('Content-Type: application/json');
 

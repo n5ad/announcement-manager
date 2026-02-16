@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/auth_check.inc';
+
 if (!isset($_POST['raw_line'])) {
     echo "Error: Missing cron line";
     exit;

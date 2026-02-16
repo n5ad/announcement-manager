@@ -1,6 +1,8 @@
 <?php
 // toggle_cron.php - Enable/Disable a cron job by commenting/uncommenting the line
 
+require_once __DIR__ . '/auth_check.inc';
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo "Method not allowed.";

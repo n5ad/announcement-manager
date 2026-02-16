@@ -1,8 +1,8 @@
 <?php
 
-// list_ul.php
+// list_ul.php - CREATED BY N5AD
 
-// CREATED BY N5AD
+require_once __DIR__ . '/auth_check.inc';
 
 $SOUNDS_DIR = '/usr/local/share/asterisk/sounds/announcements';
 

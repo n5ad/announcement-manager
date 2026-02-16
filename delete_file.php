@@ -1,6 +1,8 @@
 <?php
 // delete_file.php - Delete MP3 or UL file
 
+require_once __DIR__ . '/auth_check.inc';
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo "Method not allowed.";
