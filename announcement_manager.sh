@@ -287,6 +287,7 @@ echo "link.php permissions verified."
 # STEP 10.1 – Apply your preferred IPv4 LAN detection block
 # ────────────────────────────────────────────────
 echo_step "10.1. Applying your preferred IPv4 LAN detection"
+[ -f "$LINK_PHP" ] || { echo "  → link.php missing → skipping 10.1"; return 0; }
 
 # Remove old if (empty($WANONLY)) block
 sed -i '/if (empty(\$WANONLY)) {/,/}/d' "$LINK_PHP"
