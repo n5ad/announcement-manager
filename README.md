@@ -9,14 +9,19 @@ This feature was inspired by KD5FMU, Freddie Mac, the Ham Radio Crusader. His Au
 Supermon is NOT a requirement for this program to work. It WAS made for supermon first, but Allmon3 was added to it. 
 Here is how to install it:
 first lets get to s specific directory after you after started an SSH session into your node
+
 ```
 cd /etc/asterisk/local
 ```
+
 if the directory does not exist, lets create it
+
 ```
 sudo mkdir /etc/asterisk/local
+
 ```
 then switch to the directory
+
 ```
 cd /etc/asterisk/local
 ```
