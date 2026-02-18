@@ -232,6 +232,7 @@ echo "Verified: Both scripts are executable."
 
 # STEP 10. Safely patch link.php to include announcement manager (instead of full overwrite)
 echo_step "10. Patching link.php to add Announcement Manager include"
+[ -f "$LINK_PHP" ] || { echo "  → link.php missing → skipping 10.1"; return 0; }
 
 LINK_PHP="/var/www/html/supermon/link.php"
 BACKUP_FILE="${LINK_PHP}.bak.$(date +%Y%m%d-%H%M%S)"
