@@ -6,3 +6,31 @@ This feature was inspired by KD5FMU, Freddie Mac, the Ham Radio Crusader. His Au
 
 <img width="1920" height="1032" alt="image" src="https://github.com/user-attachments/assets/eab34d79-fa91-4167-a685-07ddff01934f" />
 <img width="1920" height="1032" alt="image" src="https://github.com/user-attachments/assets/808fc895-4a14-4b8f-9860-ba3f1347a71a" />
+Supermon is NOT a requirement for this program to work. It WAS made for supermon first, but Allmon3 was added to it. 
+Here is how to install it:
+first lets get to s specific directory after you after started an SSH session into your node
+```
+cd /etc/asterisk/local
+```
+if the directory does not exist, lets create it
+```
+sudo mkdir /etc/asterisk/local
+```
+then switch to the directory
+```
+cd /etc/asterisk/local
+```
+
+Then lets download the installer script
+
+```
+sudo wget https://raw.githubusercontent.com/N5AD/announcement-manager/refs/heads/main/announcement_manager.sh
+```
+Then lets run the script using
+```
+sudo bash announcement_manager.sh
+```
+Then follow the promts.
+
+<img width="1920" height="1032" alt="image" src="https://github.com/user-attachments/assets/eab34d79-fa91-4167-a685-07ddff01934f" />
+<img width="1920" height="1032" alt="image" src="https://github.com/user-attachments/assets/808fc895-4a14-4b8f-9860-ba3f1347a71a" />
