@@ -230,59 +230,53 @@ fi
 chmod +x "$PLAY_SCRIPT" "$CONVERT_SCRIPT" 2>/dev/null || true
 echo "Verified: Both scripts are executable."
 
+# ────────────────────────────────────────────────
 # STEP 10. Safely patch link.php to include announcement manager (instead of full overwrite)
+# ────────────────────────────────────────────────
 echo_step "10. Patching link.php to add Announcement Manager include"
-[ -f "$LINK_PHP" ] || { echo "  → link.php missing → skipping 10.1"; return 0; }
 
 LINK_PHP="/var/www/html/supermon/link.php"
 BACKUP_FILE="${LINK_PHP}.bak.$(date +%Y%m%d-%H%M%S)"
 
-if [[ ! -f "$LINK_PHP" ]]; then
-    error "link.php not found at $LINK_PHP - cannot continue."
-fi
-
-# Create timestamped backup (multiple backups possible)
-cp -v "$LINK_PHP" "$BACKUP_FILE"
-echo "Backup created: $BACKUP_FILE"
-
-# Check if announcement include is already present
-if grep -q "include_once.*custom/announcement.inc" "$LINK_PHP"; then
-    echo "Announcement include already present in link.php — skipping patch"
+if [ ! -f "$LINK_PHP" ]; then
+    echo "  → link.php not found at $LINK_PHP → skipping patch"
 else
-    echo "Patching link.php to include Announcement Manager..."
+    # Create timestamped backup (multiple backups possible)
+    cp -v "$LINK_PHP" "$BACKUP_FILE"
+    echo "Backup created: $BACKUP_FILE"
 
-    # Find the last </div> before the footer include and add our block just before footer
-    # We look for the common pattern near the end: spinny div + footer include
-
-    # Method 1: Simple append-style patch (most reliable for Supermon)
-    # Remove old footer include if present, then append our content + footer
-
-    # Remove any existing include "footer.inc" lines at the very end
-    sed -i '/include.*footer.inc/d' "$LINK_PHP"
-
-    # Remove any trailing ?> if present (we'll add it back if needed)
-    sed -i '${/^\s*?>$/d}' "$LINK_PHP"
-
-    # Now append our desired ending
-    cat << 'EOF' >> "$LINK_PHP"
+    # Check if announcement include is already present
+    if grep -q "include_once.*custom/announcement.inc" "$LINK_PHP"; then
+        echo "Announcement include already present in link.php — skipping patch"
+    else
+        echo "Patching link.php to include Announcement Manager..."
+        
+        # Remove any existing include "footer.inc" lines at the very end
+        sed -i '/include.*footer.inc/d' "$LINK_PHP"
+        
+        # Remove any trailing ?> if present (we'll add it back if needed)
+        sed -i '${/^\s*?>$/d}' "$LINK_PHP"
+        
+        # Append our desired ending block
+        cat << 'EOF' >> "$LINK_PHP"
 
 <div id="spinny">
 </div>
-
 <?php
 include_once "custom/announcement.inc";
 echo "<br><br>";
 include_once "footer.inc";
 ?>
 EOF
+        
+        echo "link.php successfully patched with Announcement Manager include."
+    fi
 
-    echo "link.php successfully patched with Announcement Manager include."
+    # Fix permissions (just in case)
+    chown www-data:www-data "$LINK_PHP" 2>/dev/null || true
+    chmod 644 "$LINK_PHP" 2>/dev/null || true
+    echo "link.php permissions verified."
 fi
-
-# Fix permissions (just in case)
-chown www-data:www-data "$LINK_PHP"
-chmod 644 "$LINK_PHP"
-echo "link.php permissions verified."
 
 # ────────────────────────────────────────────────
 # STEP 10.1 – Apply your preferred IPv4 LAN detection block
