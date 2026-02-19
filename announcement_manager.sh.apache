@@ -407,8 +407,9 @@ fi
 # STEP 17. Quick Piper test
 # ────────────────────────────────────────────────
 echo_step "17. Quick Piper TTS test"
+/opt/piper/bin/piper/piper --version
 echo "This is a test of Piper TTS on node $(hostname)" | \
-    /opt/piper/bin/piper --model /opt/piper/voices/en_US-lessac-medium.onnx --output_file /mp3/piper_test.wav
+    /opt/piper/bin/piper/piper --model /opt/piper/voices/en_US-lessac-medium.onnx --output_file /mp3/piper_test.wav
 ls -l /mp3/piper_test.wav 2>/dev/null || warn "Test WAV not created – check Piper install"
 
 # ────────────────────────────────────────────────
