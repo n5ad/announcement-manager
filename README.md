@@ -30,6 +30,18 @@ Then follow the promts.
 <img width="1920" height="1032" alt="image" src="https://github.com/user-attachments/assets/808fc895-4a14-4b8f-9860-ba3f1347a71a" />
 
 Supermon is NOT a requirement for this program to work. It WAS made for supermon first, but Allmon3 was added to it. 
+So if you do not have Supermon 7.4+ installed, you will need to install apache2 to handle the scripts. Here is how you do that. You will NOT need to do this if Supermon7.4+ is installed as the apache2 handler will be installed with Supermon74+. Run these lines individually.
+
+```
+sudo apt update && sudo apt upgrade -y
+sudo apt install apache2 libapache2-mod-php php php-common -y
+sudo systemctl enable --now apache2
+sudo systemctl status apache2   # quick check
+```
+
+
+
+
 Here is how to install it:
 first lets get to s specific directory after you after started an SSH session into your node or from the terminal CLI if you like. 
 
