@@ -1,0 +1,400 @@
+#!/usr/bin/env bash
+#
+# setup-supermon-announcements.sh
+# Fully automates Supermon Announcements Manager setup:
+# - Installs required packages: sox + libsox-fmt-mp3 (for MP3 support) + git + perl
+# - Copies files from GitHub to /var/www/html/supermon/custom/
+# - Installs prerequisite scripts: playaudio.sh, playglobal.sh & audio_convert.sh in /etc/asterisk/local/
+# - Creates /mp3 directory with correct permissions (2775, setgid)
+# - Creates /usr/share/allmon3/custom directory with correct permissions and copies allmon-announcement.inc
+# - Automatically grants access to the invoking user
+# - Sets ownership & permissions on files
+# - Backs up and patches link.php
+# - Backs up and replaces index.html for Allmon3
+# - Creates sudoers rule for www-data
+# - Installs Piper TTS 1.2.0 ARM64 + voices
+# - Downloads piper_generate.php and piper_prompt_tts.sh
+# - Safe & idempotent (can safely run multiple times)
+#
+# Run as root: sudo bash setup-supermon-announcements.sh
+# Author: N5AD - January 2026 (updated)
+#
+set -euo pipefail
+
+# ────────────────────────────────────────────────
+# CONFIG
+# ────────────────────────────────────────────────
+REPO_URL="https://github.com/n5ad/announcement-manager.git"
+TEMP_CLONE="/tmp/supermon-announcements"
+TARGET_DIR="/var/www/html/supermon/custom"
+LINK_PHP="/var/www/html/supermon/link.php"
+MP3_DIR="/mp3"
+LOCAL_DIR="/etc/asterisk/local"
+ANNOUNCE_DIR="/usr/local/share/asterisk/sounds/announcements"
+ALLMON_DIR="/usr/share/allmon3/custom"
+
+# ────────────────────────────────────────────────
+# Helpers
+# ────────────────────────────────────────────────
+echo_step() { echo -e "\n\033[1;34m==>\033[0m $1"; }
+warn()     { echo -e "\033[1;33mWARNING:\033[0m $1" >&2; }
+error()    { echo -e "\033[1;31mERROR:\033[0m $1" >&2; exit 1; }
+check_root() { [[ $EUID -eq 0 ]] || error "Run as root (sudo)."; }
+
+# ────────────────────────────────────────────────
+# STEP 1. Ensure Apache2 + PHP is installed (required for Supermon)
+# ────────────────────────────────────────────────
+check_root
+
+echo_step "1. Ensuring Apache2 + PHP is installed (required for Supermon)"
+if ! dpkg -l apache2 >/dev/null 2>&1 || ! dpkg -l libapache2-mod-php >/dev/null 2>&1; then
+    echo " → Installing apache2 + libapache2-mod-php + php"
+    apt update || error "apt update failed"
+    apt install -y apache2 libapache2-mod-php php php-common || error "Failed to install Apache2/PHP"
+    
+    systemctl enable apache2 >/dev/null 2>&1
+    systemctl start apache2 >/dev/null 2>&1 || warn "apache2 start failed – check 'systemctl status apache2'"
+    echo "Apache2 + PHP installed and service started."
+else
+    echo "Apache2 + PHP already installed."
+fi
+
+if ! systemctl is-active --quiet apache2; then
+    warn "Apache2 not active – attempting restart"
+    systemctl restart apache2 || warn "Restart failed – please check apache2 status manually"
+fi
+
+# ────────────────────────────────────────────────
+# STEP 2. Install remaining required packages
+# ────────────────────────────────────────────────
+echo_step "2. Installing remaining required packages (sox, libsox-fmt-mp3, git, perl)"
+apt install -y sox libsox-fmt-mp3 git perl || error "Failed to install sox/git/perl packages"
+
+if ! command -v git >/dev/null 2>&1; then
+    error "git still missing after install – check apt sources/internet"
+fi
+
+# ────────────────────────────────────────────────
+# Welcome & confirmation
+# ────────────────────────────────────────────────
+echo ""
+echo "Supermon Announcements Manager - Full Setup"
+echo "──────────────────────────────────────────────"
+echo "GitHub Repo: $REPO_URL"
+echo "Target dir:      $TARGET_DIR"
+echo "MP3 dir:         $MP3_DIR"
+echo "Local scripts:   $LOCAL_DIR"
+echo "link.php:        $LINK_PHP"
+echo ""
+
+echo -n "Continue setup? (y/N) "
+read -r answer
+[[ "$answer" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+
+# ────────────────────────────────────────────────
+# STEP 3. Prompt for AllStar node number
+# ────────────────────────────────────────────────
+echo ""
+echo_step "3. Enter your AllStar node number"
+echo -n "Node number (e.g., 12345): "
+read -r NODE_NUMBER
+if [[ ! "$NODE_NUMBER" =~ ^[0-9]+$ ]]; then
+    error "Invalid node number! Please enter digits only."
+fi
+echo "Using node number: $NODE_NUMBER"
+
+# ────────────────────────────────────────────────
+# STEP 4. Clone repo
+# ────────────────────────────────────────────────
+echo_step "4. Cloning GitHub repo"
+rm -rf "$TEMP_CLONE"
+git clone --depth 1 "$REPO_URL" "$TEMP_CLONE" || error "Git clone failed"
+
+# ────────────────────────────────────────────────
+# STEP 5. Copy PHP & inc files to Supermon custom dir
+# ────────────────────────────────────────────────
+echo_step "5. Copying files to $TARGET_DIR"
+mkdir -p "$TARGET_DIR"
+cp -v "$TEMP_CLONE"/*.{php,inc} "$TARGET_DIR"/ 2>/dev/null || warn "No .php/.inc files found to copy"
+rm -rf "$TEMP_CLONE"
+
+# ────────────────────────────────────────────────
+# STEP 6. Copy announcement include to Allmon3 custom dir
+# ────────────────────────────────────────────────
+echo_step "6. Copying announcement include to Allmon3 custom dir ($ALLMON_DIR)"
+mkdir -p "$ALLMON_DIR"
+SOURCE_INC="$TARGET_DIR/allmon-announcement.inc"
+if [[ -f "$SOURCE_INC" ]]; then
+    cp -v "$SOURCE_INC" "$ALLMON_DIR/allmon-announcement.inc"
+    chown root:root "$ALLMON_DIR/allmon-announcement.inc"
+    chmod 644 "$ALLMON_DIR/allmon-announcement.inc"
+    echo "Copied $SOURCE_INC → $ALLMON_DIR"
+else
+    warn "Source file $SOURCE_INC not found – skipping Allmon3 copy"
+fi
+
+# ────────────────────────────────────────────────
+# STEP 7. Create /mp3 dir + permissions
+# ────────────────────────────────────────────────
+echo_step "7. Creating /mp3 directory with correct permissions"
+mkdir -p "$MP3_DIR"
+MP3_USER="${SUDO_USER:-$(whoami)}"
+echo "Granting /mp3 access to user: $MP3_USER"
+if id -nG "$MP3_USER" | grep -qw "www-data"; then
+    echo "$MP3_USER is already in www-data group"
+else
+    echo "Adding $MP3_USER to www-data group"
+    usermod -aG www-data "$MP3_USER"
+fi
+chown -R www-data:www-data "$MP3_DIR"
+chmod -R 2775 "$MP3_DIR"
+echo "MP3 directory permissions set (setgid enabled)."
+
+# ────────────────────────────────────────────────
+# STEP 8. Set ownership & permissions on custom files
+# ────────────────────────────────────────────────
+echo_step "8. Setting ownership & permissions on Supermon custom files"
+chown -R www-data:www-data "$TARGET_DIR"
+find "$TARGET_DIR" -type f -name "*.php" -exec chmod 644 {} \;
+find "$TARGET_DIR" -type f -name "*.inc" -exec chmod 644 {} \;
+
+# ────────────────────────────────────────────────
+# STEP 9. Create Announcements sound dir + permissions
+# ────────────────────────────────────────────────
+echo_step "9. Creating Announcements sound directory + permissions"
+mkdir -p "$ANNOUNCE_DIR"
+chown -R www-data:www-data "$ANNOUNCE_DIR"
+chmod -R 2775 "$ANNOUNCE_DIR"
+
+# ────────────────────────────────────────────────
+# STEP 10. Install prerequisite scripts in /etc/asterisk/local/
+# ────────────────────────────────────────────────
+echo_step "10. Installing prerequisite scripts in $LOCAL_DIR"
+mkdir -p "$LOCAL_DIR"
+chown asterisk:asterisk "$LOCAL_DIR" 2>/dev/null || chown root:root "$LOCAL_DIR"
+chmod 755 "$LOCAL_DIR"
+
+# playglobal.sh
+GLOBAL_SCRIPT="$LOCAL_DIR/playglobal.sh"
+if [[ ! -f "$GLOBAL_SCRIPT" ]]; then
+    echo "Creating $GLOBAL_SCRIPT"
+    cat > "$GLOBAL_SCRIPT" << EOF
+#!/bin/bash
+# playglobal.sh – Play audio file over AllStar node (global)
+NODE="$NODE_NUMBER"
+[ "\$EUID" -eq 0 ] || { echo "Run with sudo/root"; exit 1; }
+[ -z "\$1" ] && { echo "Usage: \$0 <audio_file_without_extension>"; exit 1; }
+/usr/sbin/asterisk -rx "rpt playback \${NODE} \$1"
+EOF
+    chmod +x "$GLOBAL_SCRIPT"
+    chown asterisk:asterisk "$GLOBAL_SCRIPT" 2>/dev/null || chown root:root "$GLOBAL_SCRIPT"
+    chmod 755 "$GLOBAL_SCRIPT"
+else
+    echo "$GLOBAL_SCRIPT already exists – skipping"
+fi
+
+# playaudio.sh
+PLAY_SCRIPT="$LOCAL_DIR/playaudio.sh"
+if [[ ! -f "$PLAY_SCRIPT" ]]; then
+    echo "Creating $PLAY_SCRIPT"
+    cat > "$PLAY_SCRIPT" << EOF
+#!/bin/bash
+# playaudio.sh – Play audio file over AllStar node (local)
+NODE="$NODE_NUMBER"
+[ "\$EUID" -eq 0 ] || { echo "Run with sudo/root"; exit 1; }
+[ -z "\$1" ] && { echo "Usage: \$0 <audio_file_without_extension>"; exit 1; }
+/usr/sbin/asterisk -rx "rpt localplay \${NODE} \$1"
+EOF
+    chmod +x "$PLAY_SCRIPT"
+    chown asterisk:asterisk "$PLAY_SCRIPT" 2>/dev/null || chown root:root "$PLAY_SCRIPT"
+    chmod 755 "$PLAY_SCRIPT"
+else
+    echo "$PLAY_SCRIPT already exists – skipping"
+fi
+
+# audio_convert.sh
+CONVERT_SCRIPT="$LOCAL_DIR/audio_convert.sh"
+if [[ ! -f "$CONVERT_SCRIPT" ]]; then
+    echo "Creating $CONVERT_SCRIPT"
+    cat > "$CONVERT_SCRIPT" << 'EOF'
+#!/bin/bash
+# audio_convert.sh - Convert audio to ulaw .ul
+# Usage: audio_convert.sh input_file [output_file.ul]
+INPUT_FILE="$1"
+OUTPUT_FILE="${2:-${INPUT_FILE%.*}.ul}"
+sox "$INPUT_FILE" -t raw -r 8000 -c 1 -e u-law "$OUTPUT_FILE" && echo "Conversion OK: $OUTPUT_FILE" || echo "Conversion failed"
+EOF
+    chmod +x "$CONVERT_SCRIPT"
+    chown asterisk:asterisk "$CONVERT_SCRIPT" 2>/dev/null || chown root:root "$CONVERT_SCRIPT"
+    chmod 755 "$CONVERT_SCRIPT"
+else
+    echo "$CONVERT_SCRIPT already exists – skipping"
+fi
+
+# ────────────────────────────────────────────────
+# STEP 11. Patch link.php to include Announcement Manager
+# ────────────────────────────────────────────────
+echo_step "11. Patching link.php to add Announcement Manager include"
+BACKUP_FILE="${LINK_PHP}.bak.$(date +%Y%m%d-%H%M%S)"
+if [ ! -f "$LINK_PHP" ]; then
+    echo " → link.php not found at $LINK_PHP → skipping patch"
+else
+    cp -v "$LINK_PHP" "$BACKUP_FILE"
+    echo "Backup created: $BACKUP_FILE"
+
+    if grep -q "include_once.*custom/announcement.inc" "$LINK_PHP"; then
+        echo "Announcement include already present — skipping patch"
+    else
+        echo "Patching link.php..."
+        sed -i '/include.*footer.inc/d' "$LINK_PHP"
+        sed -i '${/^\s*?>$/d}' "$LINK_PHP"
+        cat << 'EOF' >> "$LINK_PHP"
+<div id="spinny">
+</div>
+<?php
+include_once "custom/announcement.inc";
+echo "<br><br>";
+include_once "footer.inc";
+?>
+EOF
+        echo "link.php patched successfully."
+    fi
+
+    chown www-data:www-data "$LINK_PHP" 2>/dev/null || true
+    chmod 644 "$LINK_PHP" 2>/dev/null || true
+fi
+
+# ────────────────────────────────────────────────
+# STEP 12. Apply preferred IPv4 LAN detection block
+# ────────────────────────────────────────────────
+echo_step "12. Applying preferred IPv4 LAN detection in link.php"
+if [ -f "$LINK_PHP" ]; then
+    sed -i '/if (empty(\$WANONLY)) {/,/}/d' "$LINK_PHP"
+
+    cat > /tmp/ip-block.txt << 'EOF'
+if (empty($WANONLY)) {
+   $myip = exec("$WGET -t 1 -T 3 -q -O- http://checkip.dyndns.org:8245 |$CUT -d':' -f2 |$CUT -d' ' -f2 |$CUT -d'<' -f1");
+   $WL=""; $mylanip = exec("ip -4 addr show scope global | awk '/inet/ {print $2}' | cut -d/ -f1 | head -1");
+EOF
+
+    sed -i "/\$mgrport = exec.*port = /r /tmp/ip-block.txt" "$LINK_PHP"
+    rm -f /tmp/ip-block.txt
+
+    sed -i 's|\[ \$hostname \] \[ WAN:.*\] \[ .*LAN: \${mylanip} \]|[ $hostname ] [ WAN: ${myip} ] [ LAN: ${mylanip} ]|g' "$LINK_PHP"
+
+    chown www-data:www-data "$LINK_PHP" 2>/dev/null || true
+    chmod 644 "$LINK_PHP" 2>/dev/null || true
+    echo "IPv4 LAN block inserted."
+else
+    echo " → link.php missing → skipping step 12"
+fi
+
+# ────────────────────────────────────────────────
+# STEP 13. Install custom index.html for Allmon3 web root
+# ────────────────────────────────────────────────
+echo_step "13. Installing custom index.html for Allmon3"
+ALLMON_WEB_ROOT="/usr/share/allmon3"
+INDEX_FILE="$ALLMON_WEB_ROOT/index.html"
+INDEX_ORIG="$ALLMON_WEB_ROOT/index.html.orig"
+INDEX_SPARE="$ALLMON_WEB_ROOT/index.html.spare"
+mkdir -p "$ALLMON_WEB_ROOT"
+
+if [[ -f "$INDEX_FILE" ]]; then
+    [[ ! -f "$INDEX_ORIG" ]] && cp -v "$INDEX_FILE" "$INDEX_ORIG" && echo "Backup: $INDEX_ORIG"
+fi
+
+INDEX_URL="https://raw.githubusercontent.com/n5ad/announcement-manager/main/index.html"
+wget -O "$INDEX_FILE.tmp" "$INDEX_URL" || error "Failed to download index.html"
+mv "$INDEX_FILE.tmp" "$INDEX_FILE"
+chown root:root "$INDEX_FILE"
+chmod 644 "$INDEX_FILE"
+echo "Installed new index.html → $INDEX_FILE"
+
+[[ ! -f "$INDEX_SPARE" ]] && cp -v "$INDEX_FILE" "$INDEX_SPARE" && echo "Spare copy created: $INDEX_SPARE"
+
+# ────────────────────────────────────────────────
+# STEP 14. Create sudoers rule for www-data
+# ────────────────────────────────────────────────
+echo_step "14. Creating sudoers rule for www-data"
+SUDOERS_FILE="/etc/sudoers.d/99-supermon-announcements"
+cat > "$SUDOERS_FILE" << 'EOF'
+# /etc/sudoers.d/99-supermon-announcements
+# Managed by setup-supermon-announcements.sh — do not edit manually
+www-data ALL=(root) NOPASSWD: /etc/asterisk/local/playaudio.sh
+www-data ALL=(root) NOPASSWD: /usr/bin/crontab
+www-data ALL=(root) NOPASSWD: /etc/asterisk/local/audio_convert.sh
+www-data ALL=(ALL) NOPASSWD: /bin/cp, /bin/chown, /bin/chmod
+www-data ALL=(root) NOPASSWD: /usr/local/bin/piper_prompt_tts.sh
+www-data ALL=(root) NOPASSWD: /bin/rm /usr/local/share/asterisk/sounds/announcements/*.ul
+www-data ALL=(ALL) NOPASSWD: /etc/asterisk/local/playglobal.sh
+EOF
+chmod 0440 "$SUDOERS_FILE"
+chown root:root "$SUDOERS_FILE"
+echo "Sudoers file created."
+
+# ────────────────────────────────────────────────
+# STEP 15. Install Piper TTS 1.2.0 ARM64 + voices
+# ────────────────────────────────────────────────
+echo_step "15. Installing Piper TTS 1.2.0 ARM64 + voices"
+if [[ -f "/opt/piper/bin/piper" && -f "/opt/piper/voices/en_US-lessac-medium.onnx" ]]; then
+    echo "Piper + voice already installed – skipping"
+else
+    wget https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_arm64.tar.gz -O /tmp/piper.tar.gz
+    mkdir -p /opt/piper/bin /opt/piper/voices
+    tar -xzf /tmp/piper.tar.gz -C /opt/piper/bin
+    chmod +x /opt/piper/bin/piper
+    cd /opt/piper/voices
+
+    for voice in \
+        en_US-lessac-medium \
+        en_US-joe-medium \
+        en_US-amy-medium \
+        en_US-kristin-medium \
+        en_US-libritts_r-medium \
+        en_US-ryan-high; do
+        wget -4 "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/${voice#en_US-}/medium/${voice}.onnx"
+        wget -4 "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/${voice#en_US-}/medium/${voice}.onnx.json"
+    done
+
+    chown www-data:www-data *.onnx *.onnx.json
+    chmod 644 *.onnx *.onnx.json
+    rm /tmp/piper.tar.gz
+
+    # Set slower speaking rate (length_scale = 1.2)
+    JSON_FILE="/opt/piper/voices/en_US-lessac-medium.onnx.json"
+    [[ -f "$JSON_FILE" ]] && {
+        cp -f "$JSON_FILE" "${JSON_FILE}.orig" 2>/dev/null
+        sed -i 's/"length_scale"[[:space:]]*:[[:space:]]*[0-9.]\+/"length_scale": 1.2/' "$JSON_FILE"
+        grep -q '"length_scale": 1.2' "$JSON_FILE" && echo "Voice speed set (length_scale = 1.2)"
+    }
+    echo "Piper installed."
+fi
+
+# ────────────────────────────────────────────────
+# STEP 16. Download piper_prompt_tts.sh
+# ────────────────────────────────────────────────
+echo_step "16. Downloading piper_prompt_tts.sh"
+if [[ -f "/usr/local/bin/piper_prompt_tts.sh" ]]; then
+    echo "/usr/local/bin/piper_prompt_tts.sh already exists – skipping"
+else
+    wget -O /usr/local/bin/piper_prompt_tts.sh https://raw.githubusercontent.com/n5ad/announcement-manager/main/piper_prompt_tts.sh
+    chown root:root /usr/local/bin/piper_prompt_tts.sh
+    chmod +x /usr/local/bin/piper_prompt_tts.sh
+    echo "piper_prompt_tts.sh installed."
+fi
+
+# ────────────────────────────────────────────────
+# STEP 17. Quick Piper test
+# ────────────────────────────────────────────────
+echo_step "17. Quick Piper TTS test"
+echo "This is a test of Piper TTS on node $(hostname)" | \
+    /opt/piper/bin/piper --model /opt/piper/voices/en_US-lessac-medium.onnx --output_file /mp3/piper_test.wav
+ls -l /mp3/piper_test.wav 2>/dev/null || warn "Test WAV not created – check Piper install"
+
+# ────────────────────────────────────────────────
+# STEP 18. Final message
+# ────────────────────────────────────────────────
+echo_step "18. Setup complete"
+echo "Log into Supermon / Allmon3 → Announcements Manager should now appear."
+echo "If you see errors, check apache2 status and /var/log/apache2/error.log"
+echo "73 — N5AD"
