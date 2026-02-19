@@ -100,7 +100,11 @@ sudo rm -f /var/www/html/supermon/custom/*.php
 
 sudo rm -f /var/www/html/supermon/custom/*.inc
 
-
+ # 8. Restore index.html for allmon3
+ echo "Restoring Allmon3 to original"
+ sudo rm /usr/share/allmon3/index.html
+ sudo mv /usr/share/allmon3/index.html.orig index.html
+ 
 echo ""
 
 echo "Cleanup complete!"
