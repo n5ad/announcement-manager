@@ -335,39 +335,59 @@ echo "Sudoers file created."
 # ────────────────────────────────────────────────
 # STEP 15. Install Piper TTS 1.2.0 ARM64 + voices
 # ────────────────────────────────────────────────
-echo_step "15. Installing Piper TTS 1.2.0 ARM64 + voices"
+echo_step "15. Installing Piper TTS 1.2.0 ARM64"
 if [[ -f "/opt/piper/bin/piper" && -f "/opt/piper/voices/en_US-lessac-medium.onnx" ]]; then
-    echo "Piper + voice already installed – skipping"
+    echo "Piper and voice model already installed – skipping"
 else
-    wget https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_arm64.tar.gz -O /tmp/piper.tar.gz
-    mkdir -p /opt/piper/bin /opt/piper/voices
-    tar -xzf /tmp/piper.tar.gz -C /opt/piper/bin
-    chmod +x /opt/piper/bin/piper
+    sudo wget https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_arm64.tar.gz -O /tmp/piper.tar.gz
+    sudo mkdir -p /opt/piper/bin
+    sudo tar -xzf /tmp/piper.tar.gz -C /opt/piper/bin
+    sudo chmod +x /opt/piper/bin/piper
+    sudo mkdir -p /opt/piper/voices
     cd /opt/piper/voices
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
 
-    for voice in \
-        en_US-lessac-medium \
-        en_US-joe-medium \
-        en_US-amy-medium \
-        en_US-kristin-medium \
-        en_US-libritts_r-medium \
-        en_US-ryan-high; do
-        wget -4 "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/${voice#en_US-}/medium/${voice}.onnx"
-        wget -4 "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/${voice#en_US-}/medium/${voice}.onnx.json"
-    done
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/joe/medium/en_US-joe-medium.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/joe/medium/en_US-joe-medium.onnx.json
 
-    chown www-data:www-data *.onnx *.onnx.json
-    chmod 644 *.onnx *.onnx.json
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx.json
+
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/kristin/medium/en_US-kristin-medium.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/kristin/medium/en_US-kristin-medium.onnx.json
+
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx.json
+
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx
+    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx.json
+
+
+    sudo chown www-data:www-data *.onnx *.onnx.json
+    sudo chmod 644 *.onnx *.onnx.json
     rm /tmp/piper.tar.gz
-
-    # Set slower speaking rate (length_scale = 1.2)
+    echo "Setting Piper Voice Speed"
+# === Set slower speaking rate ===
+    echo "Setting Piper voice speed (length_scale = 1.2)"
     JSON_FILE="/opt/piper/voices/en_US-lessac-medium.onnx.json"
-    [[ -f "$JSON_FILE" ]] && {
-        cp -f "$JSON_FILE" "${JSON_FILE}.orig" 2>/dev/null
-        sed -i 's/"length_scale"[[:space:]]*:[[:space:]]*[0-9.]\+/"length_scale": 1.2/' "$JSON_FILE"
-        grep -q '"length_scale": 1.2' "$JSON_FILE" && echo "Voice speed set (length_scale = 1.2)"
-    }
-    echo "Piper installed."
+    
+    # Backup original file
+    sudo cp -f "$JSON_FILE" "${JSON_FILE}.orig" 2>/dev/null || true
+
+    # More robust replacement - matches 1, 1.0, 1.00 etc.
+    sudo sed -i 's/"length_scale"[[:space:]]*:[[:space:]]*[0-9.]\+/"length_scale": 1.2/' "$JSON_FILE"
+
+    # Optional: verify the change
+    if grep -q '"length_scale": 1.2' "$JSON_FILE"; then
+        echo "Successfully set length_scale to 1.2"
+    else
+        echo "Warning: length_scale was not changed (pattern not found)"
+        echo "Current value:"
+        grep "length_scale" "$JSON_FILE" || echo "(not found)"
+    fi
+
+    echo "Piper installed successfully."
 fi
 
 # ────────────────────────────────────────────────
@@ -387,8 +407,9 @@ fi
 # STEP 17. Quick Piper test
 # ────────────────────────────────────────────────
 echo_step "17. Quick Piper TTS test"
+/opt/piper/bin/piper/piper --version
 echo "This is a test of Piper TTS on node $(hostname)" | \
-    /opt/piper/bin/piper --model /opt/piper/voices/en_US-lessac-medium.onnx --output_file /mp3/piper_test.wav
+    /opt/piper/bin/piper/piper --model /opt/piper/voices/en_US-lessac-medium.onnx --output_file /mp3/piper_test.wav
 ls -l /mp3/piper_test.wav 2>/dev/null || warn "Test WAV not created – check Piper install"
 
 # ────────────────────────────────────────────────
