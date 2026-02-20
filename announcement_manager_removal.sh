@@ -23,7 +23,7 @@ echo "This includes:"
 
 echo "  - git package"
 
-echo "  - /mp3 directory"
+# echo "  - /mp3 directory"
 
 echo "  - /opt/piper directory"
 
@@ -82,7 +82,7 @@ sudo rm -f /usr/local/bin/piper_prompt_tts.sh
 
 # 5. Remove /mp3 directory
 
-echo "Removing /mp3 directory..."
+# echo "Removing /mp3 directory..."
 
 
 # 6. Remove /opt/piper directory
