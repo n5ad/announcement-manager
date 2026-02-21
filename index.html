@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!cont) return;
         cont.innerHTML = '<div class="alert alert-info">Loading Announcements Manager...</div>';
 
-        fetch('custom/announcement.inc', { cache: 'no-cache' })
+        fetch('custom/allmon-announcement.inc', { cache: 'no-cache' })
             .then(response => {
                 if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
                 return response.text();
