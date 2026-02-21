@@ -1,320 +1,339 @@
-<!DOCTYPE html>
-<!--
-#
-# Copyright(C) 2023-2025 AllStarLink
-# Allmon3 and all components are Licensed under the AGPLv3
-# see https://raw.githubusercontent.com/AllStarLink/Allmon3/develop/LICENSE
-# Bootstrap libraries are licensed separately
-# SVG icons inline are from FontAwesome licensed under CC-BY-4.0
-# create commons with attribution
-#
--->
-<html lang="en">
-<head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="AllStarLink">
-    <title>Allmon3</title>
-    <!-- CSS -->
-    <link href="css/bootstrap.min.css?v=1.7.0" rel="stylesheet" crossorigin="anonymous">
-    <link href="css/main.css?v=1.7.0" rel="stylesheet">
-    <link href="css/custom.css?v=1.7.0" rel="stylesheet">
-    <!-- Favicons -->
-    <link rel="apple-touch-icon" href="img/favicons/favicon-180x180.png" type="image/png" sizes="180x180">
-    <link rel="icon" href="img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
-    <link rel="icon" href="img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
-    <link rel="icon" href="img/favicons/favicon.ico" type="image/png">
-</head>
-<body>
-<!-- SVG Symbols – FULL SET RESTORED -->
-<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
-    <symbol id="settings" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M7.068.727c.243-.97 1.62-.97 1.864 0l.071.286a.96.96 0 0 0 1.622.434l.205-.211c.695-.719 1.888-.03 1.613.931l-.08.284a.96.96 0 0 0 1.187 1.187l.283-.081c.96-.275 1.65.918.931 1.613l-.211.205a.96.96 0 0 0 .434 1.622l.286.071c.97.243.97 1.62 0 1.864l-.286.071a.96.96 0 0 0-.434 1.622l.211.205c.719.695.03 1.888-.931 1.613l-.284-.08a.96.96 0 0 0-1.187 1.187l.081.283c.275.96-.918 1.65-1.613.931l-.205-.211a.96.96 0 0 0-1.622.434l-.071.286c-.243.97-1.62.97-1.864 0l-.071-.286a.96.96 0 0 0-1.622-.434l-.205.211c-.695.719-1.888.03-1.613-.931l.08-.284a.96.96 0 0 0-1.186-1.187l-.284.081c-.96.275-1.65-.918-.931-1.613l.211-.205a.96.96 0 0 0-.434-1.622l-.286-.071c-.97-.243-.97-1.62 0-1.864l.286-.071a.96.96 0 0 0 .434-1.622l-.211-.205c-.719-.695-.03-1.888.931-1.613l.284.08a.96.96 0 0 0 1.187-1.186l-.081-.284c-.275-.96.918-1.65 1.613-.931l.205.211a.96.96 0 0 0 1.622-.434l.071-.286zM12.973 8.5H8.25l-2.834 3.779A4.998 4.998 0 0 0 12.973 8.5zm0-1a4.998 4.998 0 0 0-7.557-3.779l2.834 3.78h4.723zM5.048 3.967c-.03.021-.058.043-.087.065l.087-.065zm-.431.355A4.984 4.984 0 0 0 3.002 8c0 1.455.622 2.765 1.615 3.678L7.375 8 4.617 4.322zm.344 7.646.087.065-.087-.065z"/>
-    </symbol>
-    <symbol id="bubble-chart" fill="currentColor" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zm-6 8A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm6 0A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1z"/>
-    </symbol>
-    <symbol id="identity" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm-1 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm-3 4c2.623 0 4.146.826 5 1.755V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1.245C3.854 11.825 5.377 11 8 11z"/>
-    </symbol>
-    <symbol id="details" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zm.5 10v-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-2.5.5a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-1zm-3 0a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-1z"/>
-    </symbol>
-    <symbol id="node" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M2 2a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h5.5v3A1.5 1.5 0 0 0 6 11.5H.5a.5.5 0 0 0 0 1H6A1.5 1.5 0 0 0 7.5 14h1a1.5 1.5 0 0 0 1.5-1.5h5.5a.5.5 0 0 0 0-1H10A1.5 1.5 0 0 0 8.5 10V7H14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm.5 3a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm2 0a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1z"/>
-    </symbol>
-    <symbol id="link-45" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/>
-        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"/>
-    </symbol>
-    <symbol id="disconnect" fill="currentColor" viewBox="0 0 448 512">
-        <path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm79 143c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/>
-    </symbol>
-    <symbol id="ban" fill="currentColor" viewBox="0 0 448 512">
-        <path d="M367.2 412.5L99.5 144.8C77.1 176.1 64 214.5 64 256c0 106 86 192 192 192c41.5 0 79.9-13.1 111.2-35.5zm45.3-45.3C434.9 335.9 448 297.5 448 256c0-106-86-192-192-192c-41.5 0-79.9 13.1-111.2 35.5L412.5 367.2zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"/>
-    </symbol>
-</svg>
+<div>
+<?php
+// allmon-announcement.inc (or announcement.inc)
+// Include this file in Allmon3 after successful login
+// Updated for local/global scope selection - February 2026
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    return;
+}
+?>
+<hr style="margin-top:30px;">
+<div id="bottom_cron_section" style="margin-top:20px;">
+    <h3>Generate Announcement with Piper TTS</h3>
+    <textarea id="tts_text" rows="4" cols="60" placeholder="Enter the text you want to convert to speech. Commas and periods are acceptable, no other punctuation is allowed..."></textarea>
+    <br><br>
+    <label for="tts_filename">Filename (letters/numbers/hyphen/underscore only, no extension):</label><br>
+    <input type="text" id="tts_filename" placeholder="e.g. morningnet" style="width:220px;">
+    <br><br>
+    <label for="tts_voice">Select voice model:</label>
+    <select id="tts_voice" class="submit" style="width: 250px;">
+        <option value="/opt/piper/voices/en_US-lessac-medium.onnx">Lessac (Medium, American female)</option>
+        <option value="/opt/piper/voices/en_US-joe-medium.onnx">Joe (Medium, American male)</option>
+        <option value="/opt/piper/voices/en_US-amy-medium.onnx">Amy (Medium, American female)</option>
+        <option value="/opt/piper/voices/en_US-kristin-medium.onnx">Kristin (Medium, American female)</option>
+        <option value="/opt/piper/voices/en_US-libritts_r-medium.onnx">Libritts_r (Medium, British female)</option>
+        <option value="/opt/piper/voices/en_US-ryan-high.onnx">Ryan (High, British female)</option>
+    </select>
+    <br><br>
+    <button id="generate_tts" class="submit">Generate WAV File</button>
+    <div id="tts_status" style="margin-top:10px; font-weight:bold; color:#28a745;"></div>
 
-<header class="navbar navbar-dark sticky-top flex-md-nowrap p-0">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="index.html">
-        <img id="header-banner-img" class="header-banner-img" src="img/asl-banner-logo.png" alt="asl-logo">
-    </a>
-    <button id="collapse-navbar-button" class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div id="navbar-midbar" class="navbar-midbar d-none d-sm-block"></div>
-    <div id="navbar-right" class="navbar-right"></div>
-</header>
+    <h3>Announcement Scheduler</h3>
+    <select id="mp3_select" class="submit" style="border:2px solid #444; width: 280px;">
+        <option value="">-- Select Audio File (MP3 or WAV) --</option>
+    </select>
+    <input type="button" class="submit" value="Install Announcement" id="install_announcement">
+    <input type="button" class="submit" value="Delete MP3/WAV" id="delete_mp3" style="background:#dc3545;color:white;border:1px solid #c82333;">
+    <input type="button" class="submit" value="Local Play" id="local_play_mp3" style="background:#28a745;color:white;border:1px solid #1e7e34;">
+    <input type="button" class="submit" value="Global Play" id="global_play_mp3" style="background:#fd7e14;color:white;border:1px solid #e06b00;">
+    <br><br>
+    <select id="ul_select" class="submit" style="border:2px solid #444; width: 280px;">
+        <option value="">-- Select .ul Announcement --</option>
+    </select>
+    <input type="button" class="submit" value="Play Now" id="run_ul">
+    <input type="button" class="submit" value="Delete .ul" id="delete_ul" style="background:#dc3545;color:white;border:1px solid #c82333;">
+    <br><br>
 
-<!-- Login Modal -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog">
-        <form id="loginBox" onsubmit="doLogin(); return false;">
-            <div id="login-modal-content" class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div id="login-modal-body" class="modal-body">
-                    <div class="container-flex">
-                        <div class="row align-items-center">
-                            <div class="col-4 fw-bolder text-end">
-                                <label for="user">Username</label>
-                            </div>
-                            <div class="col-6">
-                                <input type="text" autocomplete="username" size="20" id="user" name="user"><br>
-                            </div>
-                        </div>
-                        <div class="row align-items-center mt-2">
-                            <div class="col-4 fw-bolder text-end">
-                                <label for="pass">Password</label>
-                            </div>
-                            <div class="col-6">
-                                <input type="password" autocomplete="current-password" size="20" id="pass" name="pass">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="login-modal-footer" class="modal-footer mt-2">
-                    <input type="hidden" id="login-action" name="action" value="login">
-                    <button type="submit" class="btn btn-secondary">Login</button>
-                    <button type="button" class="btn btn-secondary" onclick="clearLogin()" data-bs-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </form>
+    <h3>Cron Manager</h3>
+    <div style="overflow-x:auto; margin-top:10px;">
+        <table id="cron_table" style="width:100%; border-collapse:collapse; border:1px solid #666; font-size:0.95em;">
+            <thead style="background:#444;color:white;">
+                <tr>
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">Min</th>
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">Hour</th>
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">DOM</th>
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">Mon</th>
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">DOW</th>
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">File</th>
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">Scope</th>           <!-- NEW column -->
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">Description</th>
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">Enabled</th>
+                    <th style="padding:8px; border:1px solid #666; text-align:center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 </div>
 
-<!-- Logout Modal -->
-<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog">
-        <form id="logoutBox">
-            <div id="logout-modal-content" class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabel">Logout</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div id="logout-modal-body" class="modal-body">
-                    Do you want to logout?
-                    <input type="hidden" id="logout-action" name="action" value="logout">
-                </div>
-                <div id="logout-modal-footer" class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="doLogout()">Logout</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearLogout()">Cancel</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Command Modal -->
-<div class="modal fade" id="commandModal" tabindex="-1" aria-labelledby="commandModalTitleBox" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-xl">
-        <div id="command-modal-content" class="modal-content modal-dialog-scrollable">
-            <div class="modal-header">
-                <h5 class="modal-title" id="commandModalTitleBox"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div id="command-modal-body" class="modal-body"></div>
-            <div id="command-modal-footer" class="modal-footer">
-                <button id="cmd-exec-close" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Main Page -->
-<div class="container-fluid">
-    <div class="row">
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky pt-3 sidebar-sticky">
-                <div class="d-grid gap-2 col-9 mx-auto my-2">
-                    <a id="nav-home-button" class="btn btn-secondary" role="button">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="align-text-bottom" aria-hidden="true">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
-                        Home
-                    </a>
-                </div>
-                <div id="asl-node-navigation"></div>
-                <hr>
-                <div id="login-out-region"></div>
-                <hr>
-                <div class="text-center text-wrap">
-                    <img src="img/asl-sidebar-logo.png" alt="asl-logo"><br>
-                    <b>Allmon v3</b><br>
-                    <span style="color:red">1.7.0</span>
-                </div>
-            </div>
-        </nav>
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div id="asl-statmon-dashboard-area"></div>
-
-            <!-- Announcement Manager section header – appears only after login -->
-            <div id="announcements-header" style="display:none; margin:40px 0 20px; padding:15px; background:#f8f9fa; border-radius:6px; border:1px solid #dee2e6;">
-                <h3 style="margin:0 0 8px 0;">Announcement Manager</h3>
-                <p style="margin:0; color:#555;">
-                    Schedule announcements • Choose <strong>local</strong> (this node only) or <strong>global</strong> (this node + all linked nodes)
-                </p>
-            </div>
-
-            <!-- Announcements Manager will be appended here after login -->
-        </main>
-        <footer class="col-md-9 ms-sm-auto col-lg-10 px-md-4 my-2 mx-3">
-            <hr>
-            <p>Copyright &copy; 2023-2025 AllStarLink<br>
-            Allmon3 is distributed under the terms of the <a href="https://raw.githubusercontent.com/AllStarLink/Allmon3/develop/LICENSE">AGPLv3</a></p>
-        </footer>
-    </div>
-</div>
-
-<!-- Scripts -->
-<script src="js/bootstrap.bundle.min.js?v=1.7.0" crossorigin="anonymous"></script>
-<script src="js/functions.js?v=1.7.0" crossorigin="anonymous"></script>
-<script src="js/commands.js?v=1.7.0" crossorigin="anonymous"></script>
-<script src="js/index.js?v=1.7.0" crossorigin="anonymous"></script>
-<!-- jQuery - required for announcement manager JavaScript -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
-<!-- Load Announcements Manager reliably on every page load / refresh -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('[Announce] Page loaded - starting');
-    let container = null;
-    let isLoggedIn = false;
-    let pollInterval = null;
+$(document).ready(function() {
 
-    function createContainer() {
-        if (container) return container;
-        container = document.createElement('div');
-        container.id = 'announcements-container';
-        container.style.marginTop = '40px';
-        container.style.padding = '20px 0';
-        container.style.borderTop = '2px solid #dee2e6';
-        let dashboard = document.getElementById('asl-statmon-dashboard-area');
-        if (!dashboard) {
-            dashboard = document.querySelector('main') || document.body;
-        }
-        dashboard.appendChild(container);
-        console.log('[Announce] Container created');
-        return container;
-    }
-
-    function loadAnnouncements() {
-        if (!isLoggedIn) return;
-        console.log('[Announce] Loading manager');
-
-        // Show header when loading announcements
-        const header = document.getElementById('announcements-header');
-        if (header) header.style.display = 'block';
-
-        const cont = createContainer();
-        if (!cont) return;
-        cont.innerHTML = '<div class="alert alert-info">Loading Announcements Manager...</div>';
-
-        fetch('custom/allmon-announcement.inc', { cache: 'no-cache' })
-            .then(response => {
-                if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
-                return response.text();
-            })
-            .then(html => {
-                let cleaned = html
-                    .replace(/<\?php\s*if\s*\([^)]*\)\s*\{[\s\S]*?\}\s*\?>/gs, '')
-                    .replace(/<\?php[\s\S]*?\?>/gs, '')
-                    .trim();
-                cont.innerHTML = cleaned;
-                const scripts = cont.getElementsByTagName('script');
-                Array.from(scripts).forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
-                });
-                console.log('[Announce] Loaded successfully');
-            })
-            .catch(err => {
-                console.error('[Announce] Load error:', err);
-                cont.innerHTML = `<div class="alert alert-danger">Failed: ${err.message}</div>`;
+    // Load dropdowns
+    function loadMP3Dropdown() {
+        $.getJSON("/supermon/custom/list_mp3.php", function(files) {
+            $("#mp3_select").empty().append($("<option>").val("").text("-- Select Audio File (MP3/WAV) --"));
+            $.each(files, function(i, f) {
+                $("#mp3_select").append($("<option>").val(f).text(f));
             });
+        }).fail(function() { console.error("Failed to load MP3 list"); });
     }
+    loadMP3Dropdown();
 
-    function removeAnnouncements() {
-        if (container) {
-            container.remove();
-            container = null;
-            console.log('[Announce] Removed (logout detected)');
+    function loadULDropdown() {
+        $.getJSON("/supermon/custom/list_ul.php", function(files) {
+            $("#ul_select").empty().append($("<option>").val("").text("-- Select .ul Announcement --"));
+            $.each(files, function(i, f) {
+                $("#ul_select").append($("<option>").val(f).text(f));
+            });
+        }).fail(function() { console.error("Failed to load UL list"); });
+    }
+    loadULDropdown();
+
+    // Button handlers with .off().on() to prevent duplicates
+    $("#delete_mp3").off('click.mp3-delete').on('click.mp3-delete', function() {
+        let f = $("#mp3_select").val();
+        if (!f || !confirm("Delete " + f + "?")) return;
+        $.post("/supermon/custom/delete_file.php", {type:"mp3", file:f}, function(r){
+            alert(r);
+            loadMP3Dropdown();
+        }).fail(function() { alert("Delete failed."); });
+    });
+
+    $("#local_play_mp3").off('click.local-play').on('click.local-play', function() {
+        let f = $("#mp3_select").val();
+        if (!f) { alert("Select an MP3/WAV file first"); return; }
+        $.post("/supermon/custom/run_announcement.php", { file: f, source: "mp3" }, function(r){ alert(r); })
+            .fail(function() { alert("Local play failed - check logs or permissions."); });
+    });
+
+    $("#global_play_mp3").off('click.global-play').on('click.global-play', function() {
+        let f = $("#mp3_select").val();
+        if (!f) { alert("Select an MP3/WAV file first"); return; }
+        if (!confirm("WARNING: This will play on this node AND all linked nodes.\n\nContinue?")) return;
+        $.post("/supermon/custom/globalplay.php", { file: f, source: "mp3" }, function(r){ alert(r); })
+            .fail(function() { alert("Global play failed - check logs or permissions."); });
+    });
+
+    $("#run_ul").off('click.ul-play').on('click.ul-play', function() {
+        let f = $("#ul_select").val();
+        if (!f) { alert("Select announcement first"); return; }
+        $.post("/supermon/custom/run_announcement.php", { file: f, source: "ul" }, function(r){ alert(r); })
+            .fail(function() { alert("Play Now failed - check logs or permissions."); });
+    });
+
+    $("#delete_ul").off('click.ul-delete').on('click.ul-delete', function() {
+        let f = $("#ul_select").val();
+        if (!f || !confirm("Delete " + f + "?")) return;
+        $.post("/supermon/custom/delete_file.php", {type:"ul", file:f}, function(r){
+            alert(r);
+            loadULDropdown();
+        }).fail(function() { alert("Delete failed."); });
+    });
+
+    $("#generate_tts").off('click.tts-gen').on('click.tts-gen', function() {
+        let text = $("#tts_text").val().trim();
+        let fn = $("#tts_filename").val().trim();
+        let voice = $("#tts_voice").val();
+        if (!text || !fn) { alert("Text and filename are required"); return; }
+        if (!/^[a-zA-Z0-9_-]+$/.test(fn)) {
+            alert("Filename: letters, numbers, hyphen or underscore only (no spaces/special chars)");
+            return;
         }
-        // Hide header on logout
-        const header = document.getElementById('announcements-header');
-        if (header) header.style.display = 'none';
-    }
+        if (!voice) { alert("Please select a voice model"); return; }
+        $("#tts_status").text("Generating WAV... Please wait").css("color", "#28a745");
+        $.post("/supermon/custom/piper_generate.php", { text, filename: fn, voice })
+            .done(function(resp) {
+                $("#tts_status").text(resp);
+                if (resp.toLowerCase().includes("success") || resp.toLowerCase().includes("generated")) {
+                    $("#tts_text").val("");
+                    $("#tts_filename").val("");
+                    setTimeout(loadMP3Dropdown, 1200);
+                    setTimeout(() => {
+                        $("#tts_status").fadeOut(800, function() {
+                            $(this).text("").css("color", "#28a745").show();
+                        });
+                    }, 3000);
+                }
+            })
+            .fail(function() {
+                $("#tts_status").text("Failed to generate WAV - check server logs").css("color", "#dc3545");
+            });
+    });
 
-    // Reliable logout/login detection
-    function updateLoginState() {
-        const hasLogout = !!document.querySelector('#login-out-region [onclick*="doLogout"], #login-out-region [data-bs-target="#logoutModal"], .btn-logout');
-        const loginModalOpen = document.getElementById('loginModal')?.classList.contains('show');
-        const dashboardVisible = document.getElementById('asl-statmon-dashboard-area')?.offsetParent !== null;
-        const nowLoggedIn = hasLogout && !loginModalOpen && dashboardVisible;
-        console.log('[Announce] State check:', { hasLogout, loginModalOpen, dashboardVisible, nowLoggedIn });
-        if (nowLoggedIn !== isLoggedIn) {
-            isLoggedIn = nowLoggedIn;
-            if (isLoggedIn) {
-                loadAnnouncements();
-            } else {
-                removeAnnouncements();
+    // ── Updated: Cron table loading ──
+    function loadCronList() {
+        $.getJSON("/supermon/custom/list_cron.php", function(crons) {
+            let table = $("#cron_table tbody");
+            table.empty();
+            crons.forEach(function(c) {
+                let row = $("<tr>");
+                let parts = c.time.split(" ");
+                row.append($("<td>").text(parts[0] || "*"));
+                row.append($("<td>").text(parts[1] || "*"));
+                row.append($("<td>").text(parts[2] || "*"));
+                row.append($("<td>").text(parts[3] || "*"));
+                row.append($("<td>").text(parts[4] || "*"));
+                row.append($("<td>").text(c.file));
+                // NEW: Scope column
+                let scopeText = (c.scope || "local").toUpperCase();
+                let scopeCell = $("<td>").text(scopeText).css({
+                    fontWeight: "bold",
+                    color: scopeText === "GLOBAL" ? "#fd7e14" : "#28a745"
+                });
+                row.append(scopeCell);
+                row.append($("<td>").text(c.desc || ""));
+                let isEnabled = !c.raw.startsWith('#');
+                let toggleBtn = $("<button>")
+                    .text(isEnabled ? "Enabled" : "Disabled")
+                    .css({
+                        backgroundColor: isEnabled ? "#28a745" : "#dc3545",
+                        color: "white",
+                        border: "1px solid " + (isEnabled ? "#218838" : "#c82333"),
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        borderRadius: "4px",
+                        fontWeight: "bold"
+                    })
+                    .click(function() {
+                        let $this = $(this);
+                        let newState = !isEnabled;
+                        if (!confirm(`Really ${newState ? "enable" : "disable"} "${c.file}"?`)) return;
+                        $this.prop("disabled", true).text("Updating…");
+                        $.post("/supermon/custom/toggle_cron.php", {
+                            raw_line: c.raw,
+                            enable: newState ? 1 : 0
+                        }, function(data) {
+                            alert(data);
+                            loadCronList();
+                        }).fail(() => alert("Toggle failed."))
+                         .always(() => $this.prop("disabled", false));
+                    });
+                row.append($("<td>").append(toggleBtn));
+
+                let acts = $("<td>").css("white-space", "nowrap");
+                $("<button>").text("Play Now").addClass("small-btn play")
+                    .click(() => {
+                        if (!confirm("Play " + c.file + " now?")) return;
+                        $.post("/supermon/custom/run_announcement.php", {file: c.file}, r => alert(r));
+                    }).appendTo(acts);
+                $("<button>").text("Edit").addClass("small-btn edit")
+                    .click(function() {
+                        if (c.raw.includes("/bin/bash -c") && c.raw.includes("date +\\%d") && c.raw.includes("playaudio.sh")) {
+                            alert("Editing is not available for advanced/nth-week scheduled cron jobs.\n\n" +
+                                  "These jobs use special logic (e.g. '2nd Monday of the month').\n" +
+                                  "To change this job, please delete it and create a new one.");
+                            return;
+                        }
+                        let p = c.time.split(" ");
+                        let min   = prompt("Minute:", p[0]); if (min === null) return;
+                        let hour  = prompt("Hour:", p[1]); if (hour === null) return;
+                        let dom   = prompt("DOM:", p[2]); if (dom === null) return;
+                        let month = prompt("Month:", p[3]); if (month === null) return;
+                        let dow   = prompt("DOW:", p[4]); if (dow === null) return;
+                        $.post("/supermon/custom/update_announcement.php", {
+                            raw_line: c.raw, min, hour, dom, month, dow
+                        }, resp => { alert(resp); loadCronList(); });
+                    }).appendTo(acts);
+                $("<button>").text("Delete").addClass("small-btn del")
+                    .click(() => {
+                        if (!confirm("Delete cron for " + c.file + "?")) return;
+                        $.post("/supermon/custom/delete_announcement.php", {raw_line: c.raw}, r => {
+                            alert(r); loadCronList();
+                        });
+                    }).appendTo(acts);
+                row.append(acts);
+                table.append(row);
+            });
+        }).fail(() => console.error("Failed to load cron list"));
+    }
+    loadCronList();
+
+    // ── Updated: Install Announcement with scope choice ──
+    $("#install_announcement").off('click.install').on('click.install', function() {
+        let mp3 = $("#mp3_select").val();
+        if (!mp3) { alert("Please select an MP3 file."); return; }
+
+        let min   = prompt("Minute:Which minute of the hour do you want this to play?", "45"); if(min===null) return;
+        let hour  = prompt("Hour:Which hour or range of hours do you want this to play?\n* = every hour\nsingle=12\nselected=6,10,16\nrange=7-20\nevery 2 hours =7-19/2", "7-20"); if(hour===null) return;
+        let dom   = prompt("DOM:Which day or range of days do you want this to play?\n* = everyday\n1-31\nselected=1,7,23\nrange=12-18", "*"); if(dom===null) return;
+        let month = prompt("Month:Which Months do you want this to play?\n* = every month\nJan=1 Dec=12", "*"); if(month===null) return;
+        let dow   = prompt("DOW: Which Day or days of the week do you want this to play?\n* = every day\nSun=1 Sat=7\nor range/list\n\nSingle number 1-7 = nth-week scheduling", "*"); if(dow===null) return;
+
+        let week = "*";
+        let useNth = false;
+        if (/^[1-7]$/.test(dow.trim())) {
+            week = prompt("Week of month? (* = every, 1–5 = specific)", "*");
+            if (week === null) week = "*";
+            week = week.trim();
+            if (week !== "*" && /^[1-5]$/.test(week)) useNth = true;
+            else week = "*";
+        }
+
+        let desc = prompt("Description:", "Scheduled announcement");
+        if (!desc || !desc.trim()) { alert("Description required."); return; }
+
+        // NEW: Ask for local or global
+        let scopeInput = prompt(
+            "Playback scope?\n\n" +
+            "local  = this node only\n" +
+            "global = this node + all currently linked nodes\n\n" +
+            "Enter local or global (default = local)",
+            "local"
+        );
+
+        if (scopeInput === null) return;
+
+        let scope = scopeInput.trim().toLowerCase();
+        if (scope !== "global") scope = "local";
+
+        if (scope === "global") {
+            if (!confirm("GLOBAL selected → announcement will play on ALL connected nodes.\n\nProceed?")) {
+                return;
             }
         }
-    }
 
-    // Hook doLogin/doLogout as fallback
-    const originalDoLogin = window.doLogin || function(){ return Promise.resolve(); };
-    window.doLogin = async function(...args) {
-        const result = await originalDoLogin.apply(this, args);
-        isLoggedIn = true;
-        loadAnnouncements();
-        return result;
-    };
-
-    const originalDoLogout = window.doLogout || function(){};
-    window.doLogout = function(...args) {
-        originalDoLogout.apply(this, args);
-        isLoggedIn = false;
-        removeAnnouncements();
-    };
-
-    // Poll for state changes (every 2 seconds)
-    pollInterval = setInterval(updateLoginState, 2000);
-    // Initial check
-    updateLoginState();
-
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
-        if (pollInterval) clearInterval(pollInterval);
+        $.post("/supermon/custom/announcement.php", {
+            file: mp3,
+            min, hour, dom, month, dow, week,
+            use_nth: useNth ? 1 : 0,
+            desc,
+            scope: scope              // ← new field passed to announcement.php
+        }, data => {
+            alert(data);
+            loadULDropdown();
+            loadCronList();
+            loadMP3Dropdown();
+        }).fail(() => alert("Install failed."));
     });
 });
 </script>
-</body>
-</html>
+
+<style>
+    .small-btn { font-size:0.9em; padding:4px 8px; margin:0 3px; cursor:pointer; border:none; border-radius:4px; }
+    .play { background:#17a2b8; color:white; }
+    .edit { background:#ffc107; color:black; }
+    .del { background:#dc3545; color:white; }
+    .submit { padding:6px 12px; margin:4px; }
+    #local_play_mp3:hover, #global_play_mp3:hover { opacity:0.85; }
+    #cron_table th, #cron_table td {
+        border: 1px solid #666;
+        padding: 8px 10px;
+        text-align: center;
+    }
+    #cron_table tbody tr:nth-child(even) { background-color: #f9f9f9; }
+    #cron_table tbody tr:hover { background-color: #f0f8ff; }
+    #cron_table td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+    }
+    #cron_table td:last-child {
+        white-space: normal;
+        max-width: none;
+    }
+</style>
+<?php } ?>
+</div>
