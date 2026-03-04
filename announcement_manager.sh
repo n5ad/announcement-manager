@@ -59,7 +59,7 @@ fi
             log INFO "Installing dependency: $dep"
             apt install -y "$dep" || error_exit "Failed to install $dep"
         fi
-   
+  done 
 echo ""
 echo "Supermon Announcements Manager - Full Setup"
 echo "──────────────────────────────────────────────"
