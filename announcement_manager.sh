@@ -52,14 +52,7 @@ echo "All required packages (sox, libsox-fmt-mp3, git, perl) installed or alread
 if ! command -v git >/dev/null 2>&1; then
     error "git is still not installed after apt. Check your internet or apt sources."
 fi
-   # Install dependencies
-    local deps=("apache2" "php" "libapache2-mod-php" "libcgi-session-perl" "bc")
-    for dep in "${deps[@]}"; do
-        if ! package_installed "$dep"; then
-            log INFO "Installing dependency: $dep"
-            apt install -y "$dep" || error_exit "Failed to install $dep"
-        fi
-  done 
+ 
 echo ""
 echo "Supermon Announcements Manager - Full Setup"
 echo "──────────────────────────────────────────────"
