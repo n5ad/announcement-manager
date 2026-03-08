@@ -186,7 +186,7 @@ $("#install_announcement").click(function() {
     let hour  = prompt("Hour: Which hour or range of hours do you want this to play?\n* = every hour\nsingle= 12\nselected= 6,10,16\nrange= 7-20\nevery 2 hours between selected = 7-19/2", "7-20"); if(hour===null) return;
     let dom   = prompt("DOM: Which day or range of days do you want this to play?\n* = everyday\n1-31\nselected= 1,7,23\nrange= 12-18", "*"); if(dom===null) return;
     let month = prompt("Month: Which Months do you want this to play?\n* = every month\nJan = 1 Dec = 12", "*"); if(month===null) return;
-    let dow   = prompt("DOW: Which Day or days of the week do you want this to play?\n* = every day\nSun=1 Sat=7\nor range/list\n\nSingle number 1-7 = nth-week scheduling", "*"); if(dow===null) return;
+    let dow   = prompt("DOW: Which Day or days of the week do you want this to play?\n* = every day\nSun=0 or 7 Sat=6\nor range/list\n\nSingle number 1-7 = nth-week scheduling", "*"); if(dow===null) return;
 
     let week = "*";
     let useNth = false;
