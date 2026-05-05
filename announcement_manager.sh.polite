@@ -164,6 +164,55 @@ EOF
 else
     echo "$GLOBAL_SCRIPT already exists – skipping"
 fi
+# ----- polite_global.sh -----
+POLITE_GLOBAL_SCRIPT="$LOCAL_DIR/polite_global.sh"
+if [[ ! -f "$POLITE_GLOBAL_SCRIPT" ]]; then
+    echo "Creating $POLITE_GLOBAL_SCRIPT (missing)"
+    cat > "$POLITE_GLOBAL_SCRIPT" << EOF
+#!/bin/bash
+
+FILE=\$1
+NODE="$NODE_NUMBER"
+
+MAX_WAIT=300
+CHECK_INTERVAL=1
+TAIL_DELAY=2
+
+is_busy() {
+    RESULT=\$(asterisk -rx "rpt show variables \$NODE" 2>/dev/null | grep "RPT_RXKEYED" | awk -F= '{print \$2}' | tr -d ' ')
+    [ "\$RESULT" = "1" ]
+}
+
+WAITED=0
+
+while true; do
+    if is_busy; then
+        sleep \$CHECK_INTERVAL
+        WAITED=\$((WAITED + CHECK_INTERVAL))
+
+        if [ "\$WAITED" -ge "\$MAX_WAIT" ]; then
+            break
+        fi
+    else
+        sleep \$TAIL_DELAY
+        if is_busy; then
+            continue
+        fi
+        break
+    fi
+done
+
+/usr/sbin/asterisk -rx "rpt playback \${NODE} \$FILE"
+EOF
+    chmod +x "$POLITE_GLOBAL_SCRIPT"
+    chown asterisk:asterisk "$POLITE_GLOBAL_SCRIPT" 2>/dev/null || chown root:root "$POLITE_GLOBAL_SCRIPT"
+    chmod 755 "$POLITE_GLOBAL_SCRIPT"
+    echo "Created $POLITE_GLOBAL_SCRIPT"
+else
+    echo "$POLITE_GLOBAL_SCRIPT already exists – skipping"
+fi
+
+
 
 # ----- playaudio.sh -----
 PLAY_SCRIPT="$LOCAL_DIR/playaudio.sh"
@@ -191,6 +240,54 @@ EOF
 else
     echo "$PLAY_SCRIPT already exists – skipping"
 fi
+# ----- polite_play.sh -----
+POLITE_PLAY_SCRIPT="$LOCAL_DIR/polite_play.sh"
+if [[ ! -f "$POLITE_PLAY_SCRIPT" ]]; then
+    echo "Creating $POLITE_PLAY_SCRIPT (missing)"
+    cat > "$POLITE_PLAY_SCRIPT" << EOF
+#!/bin/bash
+
+FILE=\$1
+NODE="$NODE_NUMBER"
+
+MAX_WAIT=300
+CHECK_INTERVAL=1
+TAIL_DELAY=2
+
+is_busy() {
+    RESULT=\$(asterisk -rx "rpt show variables \$NODE" 2>/dev/null | grep "RPT_RXKEYED" | awk -F= '{print \$2}' | tr -d ' ')
+    [ "\$RESULT" = "1" ]
+}
+
+WAITED=0
+
+while true; do
+    if is_busy; then
+        sleep \$CHECK_INTERVAL
+        WAITED=\$((WAITED + CHECK_INTERVAL))
+
+        if [ "\$WAITED" -ge "\$MAX_WAIT" ]; then
+            break
+        fi
+    else
+        sleep \$TAIL_DELAY
+        if is_busy; then
+            continue
+        fi
+        break
+    fi
+done
+
+/usr/sbin/asterisk -rx "rpt localplay \${NODE} \$FILE"
+EOF
+    chmod +x "$POLITE_PLAY_SCRIPT"
+    chown asterisk:asterisk "$POLITE_PLAY_SCRIPT" 2>/dev/null || chown root:root "$POLITE_PLAY_SCRIPT"
+    chmod 755 "$POLITE_PLAY_SCRIPT"
+    echo "Created $POLITE_PLAY_SCRIPT"
+else
+    echo "$POLITE_PLAY_SCRIPT already exists – skipping"
+fi
+
 
 # ----- audio_convert.sh -----
 CONVERT_SCRIPT="$LOCAL_DIR/audio_convert.sh"
@@ -368,6 +465,9 @@ www-data ALL=(ALL) NOPASSWD: /bin/cp, /bin/chown, /bin/chmod
 www-data ALL=(root) NOPASSWD: /usr/local/bin/piper_prompt_tts.sh
 www-data ALL=(root) NOPASSWD: /bin/rm /usr/local/share/asterisk/sounds/announcements/*.ul
 www-data ALL=(ALL) NOPASSWD: /etc/asterisk/local/playglobal.sh
+www-data ALL=(root) NOPASSWD: /etc/asterisk/local/polite_play.sh
+www-data ALL=(root) NOPASSWD: /etc/asterisk/local/polite_global.sh
+
 EOF
     chmod 0440 "$SUDOERS_FILE"
     chown root:root "$SUDOERS_FILE"
