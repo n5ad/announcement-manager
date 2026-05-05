@@ -8,8 +8,8 @@
  */
 $TMP_DIR = '/mp3';
 $CONVERT_SCRIPT = '/etc/asterisk/local/audio_convert.sh';
-$PLAY_SCRIPT_LOCAL  = '/etc/asterisk/local/playaudio.sh';   // local node only
-$PLAY_SCRIPT_GLOBAL = '/etc/asterisk/local/playglobal.sh';  // local + all linked nodes
+$PLAY_SCRIPT_LOCAL  = '/etc/asterisk/local/polite_play.sh';   // local node only
+$PLAY_SCRIPT_GLOBAL = '/etc/asterisk/local/polite_global.sh';  // local + all linked nodes
 $SOUNDS_DIR = '/usr/local/share/asterisk/sounds/announcements';
 
 // Get POST variables
