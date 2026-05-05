@@ -28,7 +28,7 @@ foreach ($lines as $line) {
     }
 
     // Match lines that call either playaudio.sh or playglobal.sh
-    if (strpos($line, 'playaudio.sh') !== false || strpos($line, 'playglobal.sh') !== false) {
+    if (strpos($line, 'polite_play.sh') !== false || strpos($line, 'polite_global.sh') !== false) {
         $parts = preg_split('/\s+/', $line, -1, PREG_SPLIT_NO_EMPTY);
 
         // First 5 fields = cron time
@@ -38,7 +38,7 @@ foreach ($lines as $line) {
         $command = implode(" ", array_slice($parts, 5));
 
         // Extract script name and target file
-        if (preg_match('/(playaudio\.sh|playglobal\.sh)\s+(.+)$/', $command, $matches)) {
+        if (preg_match('/(polite_play\.sh|polite_global\.sh)\s+(.+)$/', $command, $matches)) {
             $script = $matches[1];
             $full_target = trim($matches[2]);
 
