@@ -4,7 +4,7 @@
 # Fully automates Supermon Announcements Manager setup:
 # - Installs required packages: sox + libsox-fmt-mp3 (for MP3 support) + git + perl
 # - Copies files from GitHub to /var/www/html/supermon/custom/
-# - Installs prerequisite scripts: playaudio.sh, playglobal.sh & audio_convert.sh in /etc/asterisk/local/ (exact from KD5FMU repos and one custom by n5ad)
+# - Installs prerequisite scripts: playaudio.sh, playglobal.sh, polite_global, polite_play  & audio_convert.sh in /etc/asterisk/local/ (exact from KD5FMU repos and two custom by n5ad)
 # - Creates /mp3 directory with correct permissions (2775, setgid)
 # - Creates /usr/share/allmon3/custom directory with correct permissions and copies allmon-announcement.inc file there
 # - Automatically grants access to the invoking user
