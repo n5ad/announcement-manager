@@ -87,21 +87,36 @@ mkdir -p "$TARGET_DIR"
 cp -v "$TEMP_CLONE"/*.{php,inc} "$TARGET_DIR"/ 2>/dev/null || warn "No .php/.inc files found"
 rm -rf "$TEMP_CLONE"
 
-# STEP 5 Copy announcement include to Allmon3 custom directory (copy, not move)
-echo_step "5 Copying announcement include to Allmon3 custom dir ($ALLMON_DIR)"
+# STEP 5. Copy announcement include + frame to Allmon3 custom directory
+echo_step "5. Copying announcement files to Allmon3 custom dir ($ALLMON_DIR)"
 mkdir -p "$ALLMON_DIR"
-
-# Source file after Supermon copy
+# Source files after Supermon copy
 SOURCE_INC="$TARGET_DIR/allmon-announcement.inc"
+SOURCE_FRAME="$TARGET_DIR/allmon-announcement-frame.php"
 
+copied=0
 if [[ -f "$SOURCE_INC" ]]; then
-    # Copy (preserves Supermon version)
     cp -v "$SOURCE_INC" "$ALLMON_DIR/allmon-announcement.inc"
     chown root:root "$ALLMON_DIR/allmon-announcement.inc"
     chmod 644 "$ALLMON_DIR/allmon-announcement.inc"
     echo "Copied $SOURCE_INC → $ALLMON_DIR"
+    ((copied++))
 else
-    warn "Source file $SOURCE_INC not found – skipping Allmon3 copy (check repo contents)"
+    warn "Source file $SOURCE_INC not found – skipping Allmon3 .inc copy"
+fi
+
+if [[ -f "$SOURCE_FRAME" ]]; then
+    cp -v "$SOURCE_FRAME" "$ALLMON_DIR/allmon-announcement-frame.php"
+    chown root:root "$ALLMON_DIR/allmon-announcement-frame.php"
+    chmod 644 "$ALLMON_DIR/allmon-announcement-frame.php"
+    echo "Copied $SOURCE_FRAME → $ALLMON_DIR"
+    ((copied++))
+else
+    warn "Source file $SOURCE_FRAME not found – skipping Allmon3 frame copy"
+fi
+
+if [[ $copied -eq 0 ]]; then
+    warn "No announcement files were copied to Allmon3 custom dir (check repo contents)"
 fi
 
 
