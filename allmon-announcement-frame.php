@@ -122,7 +122,7 @@
 
         <?php
 
-        include 'allmon-announcement.inc';
+        include '/usr/share/allmon3/custom/allmon-announcement.inc';
 
         ?>
 
