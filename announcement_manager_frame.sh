@@ -424,44 +424,7 @@ EOF
     echo "Preferred IPv4 LAN block inserted successfully."
 fi
 
-# STEP 11 Install custom index.html for Allmon3 web root
-echo_step "11 Installing custom index.html for Allmon3 (/usr/share/allmon3/)"
-
-ALLMON_WEB_ROOT="/usr/share/allmon3"
-INDEX_FILE="$ALLMON_WEB_ROOT/index.html"
-INDEX_ORIG="$ALLMON_WEB_ROOT/index.html.orig"
-INDEX_SPARE="$ALLMON_WEB_ROOT/index.html.spare"
-
-mkdir -p "$ALLMON_WEB_ROOT"
-
-# Backup existing index.html if it exists
-if [[ -f "$INDEX_FILE" ]]; then
-    if [[ ! -f "$INDEX_ORIG" ]]; then
-        cp -v "$INDEX_FILE" "$INDEX_ORIG"
-        echo "Backup created: $INDEX_ORIG"
-    else
-        echo "Original backup $INDEX_ORIG already exists – skipping backup"
-    fi
-fi
-
-# Download fresh index.html from repo (raw URL)
-INDEX_URL="https://raw.githubusercontent.com/n5ad/announcement-manager/main/index.html"
-
-wget -O "$INDEX_FILE.tmp" "$INDEX_URL" || error "Failed to download index.html from repo"
-
-# Install it
-mv "$INDEX_FILE.tmp" "$INDEX_FILE"
-chown root:root "$INDEX_FILE"
-chmod 644 "$INDEX_FILE"
-echo "Installed new index.html → $INDEX_FILE"
-
-# Create spare copy of the new file
-if [[ ! -f "$INDEX_SPARE" ]]; then
-    cp -v "$INDEX_FILE" "$INDEX_SPARE"
-    echo "Spare copy created: $INDEX_SPARE"
-else
-    echo "Spare copy $INDEX_SPARE already exists – skipping"
-fi
+# removed step 11 altogether, no manipulation of index.html anymore, may need to use this step to update some variable file for index.html to use for the inframe
 
 # STEP 12. Create sudoers rule for www-data
 echo_step "12. Creating sudoers rule for www-data (/etc/sudoers.d/99-supermon-announcements)"
