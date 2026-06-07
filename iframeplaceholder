@@ -1,0 +1,77 @@
+<!-- ========= GENERIC CONFIGURABLE CUSTOM IFRAME ====================== -->
+<!-- Created by N5AD June 2026 for consideration of implemtation -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    let iframeContainer = null;
+
+    function createIframe() {
+        if (iframeContainer) return;
+
+        fetch('/allmon3/custom/custom-config.php')
+            .then(response => response.json())
+            .then(cfg => {
+                if (!cfg.enabled || !cfg.url) return;
+
+                iframeContainer = document.createElement('div');
+                iframeContainer.id = 'custom-iframe-container';
+                iframeContainer.style.margin = '40px 0';
+
+                let html = `<hr style="margin: 30px 0 20px 0;">`;
+                if (cfg.show_title && cfg.title) {
+                    html += `<h3 style="text-align:center; color:#333;">${cfg.title}</h3>`;
+                }
+
+                html += `
+                    <iframe 
+                        id="custom-iframe"
+                        src="${cfg.url}"
+                        style="width:100%; height:${cfg.initial_height || '1600px'}; border:${cfg.border || '1px solid #dee2e6'}; border-radius:8px; overflow:hidden; background:white;"
+                        frameborder="0" allowfullscreen>
+                    </iframe>`;
+
+                iframeContainer.innerHTML = html;
+
+                const target = document.getElementById('asl-statmon-dashboard-area') || document.querySelector('main');
+                if (target) target.appendChild(iframeContainer);
+
+                // Auto-resize
+                if (cfg.auto_resize) {
+                    const frame = document.getElementById('custom-iframe');
+                    if (frame) {
+                        frame.onload = function() {
+                            try {
+                                this.style.height = (this.contentWindow.document.body.scrollHeight + 100) + 'px';
+                            } catch(e) {}
+                        };
+                        setTimeout(() => frame.onload(), 1200);
+                    }
+                }
+            })
+            .catch(err => console.error("Custom iframe config failed:", err));
+    }
+
+    // Improved login detection
+    function checkForLogin() {
+        const loggedIn = document.querySelector('#login-out-region') && 
+                        (document.querySelector('#login-out-region button[onclick*="doLogout"]') || 
+                         document.querySelector('.btn-logout') || 
+                         document.querySelector('[data-bs-target="#logoutModal"]'));
+        
+        if (loggedIn) {
+            createIframe();
+        } else if (iframeContainer) {
+            iframeContainer.remove();
+            iframeContainer = null;
+        }
+    }
+
+    // Run checks
+    setTimeout(checkForLogin, 1000);
+    setInterval(checkForLogin, 2500);
+});
+</script>
+<!-- ================================================================ -->
+
+</body>
+</html>
