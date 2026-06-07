@@ -1,0 +1,14 @@
+; created by N5AD June 2026 for consideration of implementation
+
+
+; ====================== CUSTOM IFRAME ======================
+[custom_iframe]
+enabled = true
+url = /allmon3/custom/allmon-announcement-frame.php
+title = Announcement Manager
+initial_height = 800px
+auto_resize = true
+show_title = true
+border = 1px solid #dee2e6
+margin_top = 40px
+margin_bottom = 20px
