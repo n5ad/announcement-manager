@@ -477,7 +477,7 @@ EOF
 # STEP 13. Install Piper TTS 1.2.0 (amd64 or arm64)
 echo_step "13. Installing Piper TTS 1.2.0"
 
-# Detect architecture to choose correct binary
+# Detect architecture
 ARCH=$(uname -m)
 if [[ "$ARCH" == "x86_64" || "$ARCH" == "amd64" ]]; then
     PIPER_FILE="piper_amd64.tar.gz"
@@ -490,50 +490,69 @@ else
     exit 1
 fi
 
-if [[ -f "/opt/piper/bin/piper" && -f "/opt/piper/voices/en_US-lessac-medium.onnx" ]]; then
-    echo "Piper and voice model already installed – skipping"
+# Piper binary path (note the nested piper/piper)
+PIPER_BIN="/opt/piper/bin/piper/piper"
+
+# Install Piper binary only if missing
+if [[ -f "$PIPER_BIN" && -x "$PIPER_BIN" ]]; then
+    echo "Piper binary already installed at $PIPER_BIN – skipping download"
 else
+    echo "Downloading and installing Piper binary..."
     sudo wget https://github.com/rhasspy/piper/releases/download/v1.2.0/$PIPER_FILE -O /tmp/piper.tar.gz
     sudo mkdir -p /opt/piper/bin
     sudo tar -xzf /tmp/piper.tar.gz -C /opt/piper/bin
-    sudo chmod +x /opt/piper/bin/piper
-    sudo mkdir -p /opt/piper/voices
-    cd /opt/piper/voices
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/joe/medium/en_US-joe-medium.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/joe/medium/en_US-joe-medium.onnx.json
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx.json
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/kristin/medium/en_US-kristin-medium.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/kristin/medium/en_US-kristin-medium.onnx.json
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx.json
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx
-    sudo wget -4 https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx.json
-    sudo chown www-data:www-data *.onnx *.onnx.json
-    sudo chmod 644 *.onnx *.onnx.json
-    rm /tmp/piper.tar.gz
-    echo "Setting Piper Voice Speed"
-# === Set slower speaking rate ===
-    echo "Setting Piper voice speed (length_scale = 1.2)"
+    sudo chmod +x "$PIPER_BIN"
+    rm -f /tmp/piper.tar.gz
+    echo "Piper binary installed at $PIPER_BIN"
+fi
+
+# Create voices directory
+sudo mkdir -p /opt/piper/voices
+cd /opt/piper/voices
+
+# Function to download a voice if missing (same as before)
+download_voice() {
+    local onnx_file="$1"
+    local json_file="${onnx_file}.json"
+    local base_url="https://huggingface.co/rhasspy/piper-voices/resolve/main"
+
+    if [[ -f "$onnx_file" && -f "$json_file" ]]; then
+        echo "Voice $onnx_file already exists – skipping"
+    else
+        echo "Downloading voice: $onnx_file"
+        sudo wget -4 "$base_url/$2" -O "$onnx_file"
+        sudo wget -4 "$base_url/$3" -O "$json_file"
+    fi
+}
+
+# Download voices only if missing
+download_voice "en_US-lessac-medium.onnx"     "en/en_US/lessac/medium/en_US-lessac-medium.onnx"     "en/en_US/lessac/medium/en_US-lessac-medium.onnx.json"
+download_voice "en_US-joe-medium.onnx"        "en/en_US/joe/medium/en_US-joe-medium.onnx"          "en/en_US/joe/medium/en_US-joe-medium.onnx.json"
+download_voice "en_US-amy-medium.onnx"        "en/en_US/amy/medium/en_US-amy-medium.onnx"          "en/en_US/amy/medium/en_US-amy-medium.onnx.json"
+download_voice "en_US-kristin-medium.onnx"    "en/en_US/kristin/medium/en_US-kristin-medium.onnx"  "en/en_US/kristin/medium/en_US-kristin-medium.onnx.json"
+download_voice "en_US-libritts_r-medium.onnx" "en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx" "en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx.json"
+download_voice "en_US-ryan-low.onnx"          "en/en_US/ryan/low/en_US-ryan-low.onnx"              "en/en_US/ryan/low/en_US-ryan-low.onnx.json"
+
+# Set permissions
+sudo chown www-data:www-data *.onnx *.onnx.json 2>/dev/null || true
+sudo chmod 644 *.onnx *.onnx.json 2>/dev/null || true
+
+# === Set slower speaking rate for lessac (only if the file exists) ===
+if [[ -f "/opt/piper/voices/en_US-lessac-medium.onnx.json" ]]; then
+    echo "Setting Piper voice speed (length_scale = 1.2) for lessac-medium"
     JSON_FILE="/opt/piper/voices/en_US-lessac-medium.onnx.json"
-   
-    # Backup original file
+    
     sudo cp -f "$JSON_FILE" "${JSON_FILE}.orig" 2>/dev/null || true
-    # More robust replacement - matches 1, 1.0, 1.00 etc.
     sudo sed -i 's/"length_scale"[[:space:]]*:[[:space:]]*[0-9.]\+/"length_scale": 1.2/' "$JSON_FILE"
-    # Optional: verify the change
+    
     if grep -q '"length_scale": 1.2' "$JSON_FILE"; then
         echo "Successfully set length_scale to 1.2"
     else
-        echo "Warning: length_scale was not changed (pattern not found)"
-        echo "Current value:"
-        grep "length_scale" "$JSON_FILE" || echo "(not found)"
+        echo "Warning: length_scale was not changed"
     fi
-    echo "Piper installed successfully."
 fi
 
+echo "Piper TTS setup completed."
 # STEP 14. Download piper_generate.php and piper_prompt_tts.sh
 echo_step "14. Downloading piper_prompt_tts.sh"
 
