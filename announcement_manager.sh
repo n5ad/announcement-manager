@@ -20,9 +20,8 @@
 # Author: N5AD - January 2026 (updated)
 set -euo pipefail
 
-# ────────────────────────────────────────────────
 # CONFIG
-# ────────────────────────────────────────────────
+
 REPO_URL="https://github.com/n5ad/announcement-manager.git"
 TEMP_CLONE="/tmp/supermon-announcements"
 TARGET_DIR="/var/www/html/supermon/custom"
@@ -31,31 +30,28 @@ MP3_DIR="/mp3"
 LOCAL_DIR="/etc/asterisk/local"
 ANNOUNCE_DIR="/usr/local/share/asterisk/sounds/announcements"
 ALLMON_DIR="/usr/share/allmon3/custom"
-# ────────────────────────────────────────────────
+#
 # Helpers
-# ────────────────────────────────────────────────
+# 
 echo_step() { echo -e "\n\033[1;34m==>\033[0m $1"; }
 warn() { echo -e "\033[1;33mWARNING:\033[0m $1" >&2; }
 error() { echo -e "\033[1;31mERROR:\033[0m $1" >&2; exit 1; }
 check_root() { [[ $EUID -eq 0 ]] || error "Run as root (sudo)."; }
-
-# ────────────────────────────────────────────────
-# STEP 1. Install required packages FIRST – force git install
-# ────────────────────────────────────────────────
+# 
+# STEP 1. Install required packages FIRST   force git install
+# 
 check_root
 echo_step "1. Installing required packages (sox, libsox-fmt-mp3, git, perl)"
-apt update || error "apt update failed. Check internet or sources.list."
+# apt update || error "apt update failed. Check internet or sources.list."
 apt install -y git || error "Failed to install git. Check internet/apt sources."
 apt install -y sox libsox-fmt-mp3 perl || error "Failed to install other packages."
 echo "All required packages (sox, libsox-fmt-mp3, git, perl) installed or already present."
-
 if ! command -v git >/dev/null 2>&1; then
     error "git is still not installed after apt. Check your internet or apt sources."
 fi
  
 echo ""
 echo "Supermon Announcements Manager - Full Setup"
-echo "──────────────────────────────────────────────"
 echo "GitHub Repo: $REPO_URL"
 echo "Target dir: $TARGET_DIR"
 echo "MP3 dir: $MP3_DIR"
@@ -65,7 +61,6 @@ echo ""
 echo -n "Continue setup? (y/N) "
 read -r answer
 [[ "$answer" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
-
 # STEP 2. Prompt for AllStar node number
 echo ""
 echo_step "2. Enter your AllStar node number"
@@ -75,36 +70,29 @@ if [[ ! "$NODE_NUMBER" =~ ^[0-9]+$ ]]; then
     error "Invalid node number! Please enter digits only."
 fi
 echo "Using node number: $NODE_NUMBER"
-
 # STEP 3. Clone repo
 echo_step "3. Cloning GitHub repo"
 rm -rf "$TEMP_CLONE"
 git clone --depth 1 "$REPO_URL" "$TEMP_CLONE" || error "Git clone failed"
-
 # STEP 4. Copy PHP & inc files
 echo_step "4. Copying files to $TARGET_DIR"
 mkdir -p "$TARGET_DIR"
 cp -v "$TEMP_CLONE"/*.{php,inc} "$TARGET_DIR"/ 2>/dev/null || warn "No .php/.inc files found"
 rm -rf "$TEMP_CLONE"
-
 # STEP 5 Copy announcement include to Allmon3 custom directory (copy, not move)
 echo_step "5 Copying announcement include to Allmon3 custom dir ($ALLMON_DIR)"
 mkdir -p "$ALLMON_DIR"
-
 # Source file after Supermon copy
 SOURCE_INC="$TARGET_DIR/allmon-announcement.inc"
-
 if [[ -f "$SOURCE_INC" ]]; then
     # Copy (preserves Supermon version)
     cp -v "$SOURCE_INC" "$ALLMON_DIR/allmon-announcement.inc"
     chown root:root "$ALLMON_DIR/allmon-announcement.inc"
     chmod 644 "$ALLMON_DIR/allmon-announcement.inc"
-    echo "Copied $SOURCE_INC → $ALLMON_DIR"
+    echo "Copied $SOURCE_INC â†’ $ALLMON_DIR"
 else
-    warn "Source file $SOURCE_INC not found – skipping Allmon3 copy (check repo contents)"
+    warn "Source file $SOURCE_INC not found  →skipping Allmon3 copy (check repo contents)"
 fi
-
-
 # STEP 6. Create /mp3 dir + permissions
 echo_step "6. Creating /mp3 directory"
 mkdir -p "$MP3_DIR"
@@ -119,25 +107,21 @@ fi
 chown -R www-data:www-data "$MP3_DIR"
 chmod -R 2775 "$MP3_DIR"
 echo "MP3 directory permissions set with setgid. $MP3_USER can now access /mp3."
-
 # STEP 7. Set ownership & permissions on custom files
 echo_step "7 Setting ownership & permissions"
 chown -R www-data:www-data "$TARGET_DIR"
 find "$TARGET_DIR" -type f -name "*.php" -exec chmod 644 {} \;
 find "$TARGET_DIR" -type f -name "*.inc" -exec chmod 644 {} \;
-
 # STEP 8. Create Announcements dir + permissions
 echo_step "8. Creating Announcements dir + permissions"
 mkdir -p "$ANNOUNCE_DIR"
 chown -R www-data:www-data "$ANNOUNCE_DIR"
 chmod -R 2775 "$ANNOUNCE_DIR"
-
 # STEP 9. Install prerequisite scripts in /etc/asterisk/local/ (if missing)
 echo_step "9. Installing prerequisite scripts in $LOCAL_DIR"
 mkdir -p "$LOCAL_DIR"
 chown asterisk:asterisk "$LOCAL_DIR" 2>/dev/null || chown root:root "$LOCAL_DIR"
 chmod 755 "$LOCAL_DIR"
-
 # ----- playglobal.sh -----
 GLOBAL_SCRIPT="$LOCAL_DIR/playglobal.sh"
 if [[ ! -f "$GLOBAL_SCRIPT" ]]; then
@@ -145,7 +129,7 @@ if [[ ! -f "$GLOBAL_SCRIPT" ]]; then
     cat > "$GLOBAL_SCRIPT" << EOF
 #!/bin/bash
 #
-# playglobal.sh – Play an audio file over an AllStarLink v3 node (Debian 12)
+# playglobal.sh   Play an audio file over an AllStarLink v3 node (Debian 12)
 NODE="$NODE_NUMBER"
 if [ "\$EUID" -ne 0 ]; then
     echo "This script must be run with sudo or as root."
@@ -162,7 +146,7 @@ EOF
     chmod 755 "$GLOBAL_SCRIPT"
     echo "Created $GLOBAL_SCRIPT with node number: $NODE_NUMBER"
 else
-    echo "$GLOBAL_SCRIPT already exists – skipping"
+    echo "$GLOBAL_SCRIPT already exists →skipping"
 fi
 # ----- polite_global.sh -----
 POLITE_GLOBAL_SCRIPT="$LOCAL_DIR/polite_global.sh"
@@ -170,26 +154,20 @@ if [[ ! -f "$POLITE_GLOBAL_SCRIPT" ]]; then
     echo "Creating $POLITE_GLOBAL_SCRIPT (missing)"
     cat > "$POLITE_GLOBAL_SCRIPT" << EOF
 #!/bin/bash
-
 FILE=\$1
 NODE="$NODE_NUMBER"
-
 MAX_WAIT=300
 CHECK_INTERVAL=1
 TAIL_DELAY=2
-
 is_busy() {
     RESULT=\$(asterisk -rx "rpt show variables \$NODE" 2>/dev/null | grep "RPT_RXKEYED" | awk -F= '{print \$2}' | tr -d ' ')
     [ "\$RESULT" = "1" ]
 }
-
 WAITED=0
-
 while true; do
     if is_busy; then
         sleep \$CHECK_INTERVAL
         WAITED=\$((WAITED + CHECK_INTERVAL))
-
         if [ "\$WAITED" -ge "\$MAX_WAIT" ]; then
             break
         fi
@@ -201,7 +179,6 @@ while true; do
         break
     fi
 done
-
 /usr/sbin/asterisk -rx "rpt playback \${NODE} \$FILE"
 EOF
     chmod +x "$POLITE_GLOBAL_SCRIPT"
@@ -209,11 +186,8 @@ EOF
     chmod 755 "$POLITE_GLOBAL_SCRIPT"
     echo "Created $POLITE_GLOBAL_SCRIPT"
 else
-    echo "$POLITE_GLOBAL_SCRIPT already exists – skipping"
+    echo "$POLITE_GLOBAL_SCRIPT already exists  →skipping"
 fi
-
-
-
 # ----- playaudio.sh -----
 PLAY_SCRIPT="$LOCAL_DIR/playaudio.sh"
 if [[ ! -f "$PLAY_SCRIPT" ]]; then
@@ -221,7 +195,7 @@ if [[ ! -f "$PLAY_SCRIPT" ]]; then
     cat > "$PLAY_SCRIPT" << EOF
 #!/bin/bash
 #
-# playaudio.sh – Play an audio file over an AllStarLink v3 node (Debian 12)
+# playaudio.sh   Play an audio file over an AllStarLink v3 node (Debian 12)
 NODE="$NODE_NUMBER"
 if [ "\$EUID" -ne 0 ]; then
     echo "This script must be run with sudo or as root."
@@ -238,7 +212,7 @@ EOF
     chmod 755 "$PLAY_SCRIPT"
     echo "Created $PLAY_SCRIPT with node number: $NODE_NUMBER"
 else
-    echo "$PLAY_SCRIPT already exists – skipping"
+    echo "$PLAY_SCRIPT already exists →skipping"
 fi
 # ----- polite_play.sh -----
 POLITE_PLAY_SCRIPT="$LOCAL_DIR/polite_play.sh"
@@ -246,26 +220,20 @@ if [[ ! -f "$POLITE_PLAY_SCRIPT" ]]; then
     echo "Creating $POLITE_PLAY_SCRIPT (missing)"
     cat > "$POLITE_PLAY_SCRIPT" << EOF
 #!/bin/bash
-
 FILE=\$1
 NODE="$NODE_NUMBER"
-
 MAX_WAIT=300
 CHECK_INTERVAL=1
 TAIL_DELAY=2
-
 is_busy() {
     RESULT=\$(asterisk -rx "rpt show variables \$NODE" 2>/dev/null | grep "RPT_RXKEYED" | awk -F= '{print \$2}' | tr -d ' ')
     [ "\$RESULT" = "1" ]
 }
-
 WAITED=0
-
 while true; do
     if is_busy; then
         sleep \$CHECK_INTERVAL
         WAITED=\$((WAITED + CHECK_INTERVAL))
-
         if [ "\$WAITED" -ge "\$MAX_WAIT" ]; then
             break
         fi
@@ -277,7 +245,6 @@ while true; do
         break
     fi
 done
-
 /usr/sbin/asterisk -rx "rpt localplay \${NODE} \$FILE"
 EOF
     chmod +x "$POLITE_PLAY_SCRIPT"
@@ -285,10 +252,8 @@ EOF
     chmod 755 "$POLITE_PLAY_SCRIPT"
     echo "Created $POLITE_PLAY_SCRIPT"
 else
-    echo "$POLITE_PLAY_SCRIPT already exists – skipping"
+    echo "$POLITE_PLAY_SCRIPT already exists  →skipping"
 fi
-
-
 # ----- audio_convert.sh -----
 CONVERT_SCRIPT="$LOCAL_DIR/audio_convert.sh"
 if [[ ! -f "$CONVERT_SCRIPT" ]]; then
@@ -321,73 +286,131 @@ EOF
     chmod 755 "$CONVERT_SCRIPT"
     echo "Created $CONVERT_SCRIPT"
 else
-    echo "$CONVERT_SCRIPT already exists – skipping"
+    echo "$CONVERT_SCRIPT already exists  →skipping"
 fi
-
 chmod +x "$PLAY_SCRIPT" "$CONVERT_SCRIPT" 2>/dev/null || true
 echo "Verified: Both scripts are executable."
-
-# ────────────────────────────────────────────────
 # STEP 10. Safely patch link.php to include announcement manager (instead of full overwrite)
-# ────────────────────────────────────────────────
-echo_step "10. Patching link.php to add Announcement Manager include"
+echo_step "10. Updating footer.inc and restoring link.php (Announcement Manager integration)"
+
+# Define paths
+LINK_PHP="/var/www/html/supermon/link.php"
+FOOTER_INC="/var/www/html/supermon/footer.inc"
+CSS_FILE="/var/www/html/supermon/supermon.css"
+BACKUP_SUFFIX=".bak.$(date +%Y%m%d-%H%M%S)"
+
+# === 1. Restore / Fix link.php to desired ending ===
+echo_step "10a. Restoring link.php - removing announcement if previously installed"
 
 LINK_PHP="/var/www/html/supermon/link.php"
-BACKUP_FILE="${LINK_PHP}.bak.$(date +%Y%m%d-%H%M%S)"
+BACKUP_SUFFIX=".bak.$(date +%Y%m%d-%H%M%S)"
 
-if [ ! -f "$LINK_PHP" ]; then
-    echo "  → link.php not found at $LINK_PHP → skipping patch"
-else
-    # Create timestamped backup (multiple backups possible)
-    cp -v "$LINK_PHP" "$BACKUP_FILE"
-    echo "Backup created: $BACKUP_FILE"
+if [ -f "$LINK_PHP" ]; then
+    BACKUP_LINK="${LINK_PHP}${BACKUP_SUFFIX}"
+    cp -v "$LINK_PHP" "$BACKUP_LINK"
+    echo "Backup of link.php created: $BACKUP_LINK"
 
-    # Check if announcement include is already present
-    if grep -q "include_once.*custom/announcement.inc" "$LINK_PHP"; then
-        echo "Announcement include already present in link.php — skipping patch"
+    # ONLY remove the announcement include line - nothing else
+    if grep -q 'include_once.*custom/announcement\.inc' "$LINK_PHP"; then
+        sed -i '/include_once.*custom\/announcement\.inc/d' "$LINK_PHP"
+        echo "Removed include_once \"custom/announcement.inc\"; from link.php"
     else
-        echo "Patching link.php to include Announcement Manager..."
-        
-        # Remove any existing include "footer.inc" lines at the very end
-        sed -i '/include.*footer.inc/d' "$LINK_PHP"
-        
-        # Remove any trailing ?> if present (we'll add it back if needed)
-        sed -i '${/^\s*?>$/d}' "$LINK_PHP"
-        
-        # Append our desired ending block
-        cat << 'EOF' >> "$LINK_PHP"
-
-<div id="spinny">
-</div>
-<?php
-include_once "custom/announcement.inc";
-echo "<br><br>";
-include_once "footer.inc";
-?>
-EOF
-        
-        echo "link.php successfully patched with Announcement Manager include."
+        echo "Announcement include not found in link.php - no change needed"
     fi
 
-    # Fix permissions (just in case)
+    # Fix permissions
     chown www-data:www-data "$LINK_PHP" 2>/dev/null || true
     chmod 644 "$LINK_PHP" 2>/dev/null || true
-    echo "link.php permissions verified."
+else
+    echo " → link.php not found →skipping"
 fi
 
-# ────────────────────────────────────────────────
-# ────────────────────────────────────────────────
-# STEP 10.1 – Apply your preferred IPv4 LAN detection block
-# ────────────────────────────────────────────────
-echo_step "10.1. Applying your preferred IPv4 LAN detection"
+echo_step "10b. Adding announcement  to footer.inc"
 
-if [ ! -f "$LINK_PHP" ]; then
-    echo " → link.php missing → skipping 10.1"
+FOOTER_INC="/var/www/html/supermon/footer.inc"
+BACKUP_SUFFIX=".bak.$(date +%Y%m%d-%H%M%S)"
+
+if [ ! -f "$FOOTER_INC" ]; then
+    echo " → footer.inc not found →skipping"
 else
-    # Remove old if (empty($WANONLY)) block
+    BACKUP_FOOTER="${FOOTER_INC}${BACKUP_SUFFIX}"
+    cp -v "$FOOTER_INC" "$BACKUP_FOOTER"
+    echo "Backup of footer.inc created: $BACKUP_FOOTER"
+
+    if grep -q 'include_once.*custom/announcement\.inc' "$FOOTER_INC"; then
+        echo "Announcement include already present — →skipping"
+    else
+        echo "Patching footer.inc..."
+
+        awk '
+        # Look for the start of the if block
+        /if \(\$_SESSION\['"'"'sm61loggedin'"'"'\] === true\) \{/ {
+            print
+            inblock = 1
+            next
+        }
+        # When we find the closing ?> while inside the block, insert after it
+        inblock && /^\s*\?>\s*$/ {
+            print
+            print "<?php include_once \"custom/announcement.inc\"; ?>"
+            inblock = 0
+            next
+        }
+        { print }
+        ' "$FOOTER_INC" > "$FOOTER_INC.tmp" && mv "$FOOTER_INC.tmp" "$FOOTER_INC"
+
+        echo "footer.inc patched correctly (include added after ?>)."
+    fi
+
+    chown www-data:www-data "$FOOTER_INC" 2>/dev/null || true
+    chmod 644 "$FOOTER_INC" 2>/dev/null || true
+fi
+
+echo_step "10c. Appending footer CSS to supermon.css"
+
+CSS_FILE="/var/www/html/supermon/supermon.css"
+BACKUP_SUFFIX=".bak.$(date +%Y%m%d-%H%M%S)"
+
+if [ -f "$CSS_FILE" ]; then
+    BACKUP_CSS="${CSS_FILE}${BACKUP_SUFFIX}"
+    cp -v "$CSS_FILE" "$BACKUP_CSS"
+    echo "Backup of supermon.css created: $BACKUP_CSS"
+
+    # Check to see if previously updated
+    if grep -q "ANNOUNCEMENT_MANAGER" "$CSS_FILE"; then
+        echo "CSS already contains Announcement Manager footer styles — →skipping"
+    else
+        echo "Appending Announcement Manager footer styles..."
+
+        cat << 'EOF' >> "$CSS_FILE"
+
+#footer {
+    /* ANNOUNCEMENT_MANAGER */
+
+    max-width: 75%;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+EOF
+
+        echo "supermon.css updated with footer styles."
+    fi
+
+    chown www-data:www-data "$CSS_FILE" 2>/dev/null || true
+    chmod 644 "$CSS_FILE" 2>/dev/null || true
+else
+    echo " → $CSS_FILE not found →skipping CSS update"
+fi
+
+echo "Section 10 completed successfully."
+echo_step "10.1. Applying your preferred IPv4 LAN detection"
+if [ ! -f "$LINK_PHP" ]; then
+    echo " â†’ link.php missing â†’ →skipping 10.1"
+else
+   
     sed -i '/if (empty(\$WANONLY)) {/,/}/d' "$LINK_PHP"
     
-    # Write your exact desired block to a temp file
+    
     cat > /tmp/ip-block.txt << 'EOF'
 if (empty($WANONLY)) {
    $myip = exec("$WGET -t 1 -T 3 -q -O- http://checkip.dyndns.org:8245 |$CUT -d':' -f2 |$CUT -d' ' -f2 |$CUT -d'<' -f1");
@@ -408,51 +431,42 @@ EOF
     
     echo "Preferred IPv4 LAN block inserted successfully."
 fi
-
 # STEP 11 Install custom index.html for Allmon3 web root
 echo_step "11 Installing custom index.html for Allmon3 (/usr/share/allmon3/)"
-
 ALLMON_WEB_ROOT="/usr/share/allmon3"
 INDEX_FILE="$ALLMON_WEB_ROOT/index.html"
 INDEX_ORIG="$ALLMON_WEB_ROOT/index.html.orig"
 INDEX_SPARE="$ALLMON_WEB_ROOT/index.html.spare"
-
 mkdir -p "$ALLMON_WEB_ROOT"
-
 # Backup existing index.html if it exists
 if [[ -f "$INDEX_FILE" ]]; then
     if [[ ! -f "$INDEX_ORIG" ]]; then
         cp -v "$INDEX_FILE" "$INDEX_ORIG"
         echo "Backup created: $INDEX_ORIG"
     else
-        echo "Original backup $INDEX_ORIG already exists – skipping backup"
+        echo "Original backup $INDEX_ORIG already exists   →skipping backup"
     fi
 fi
-
 # Download fresh index.html from repo (raw URL)
 INDEX_URL="https://raw.githubusercontent.com/n5ad/announcement-manager/main/index.html"
-
 wget -O "$INDEX_FILE.tmp" "$INDEX_URL" || error "Failed to download index.html from repo"
-
 # Install it
 mv "$INDEX_FILE.tmp" "$INDEX_FILE"
 chown root:root "$INDEX_FILE"
 chmod 644 "$INDEX_FILE"
-echo "Installed new index.html → $INDEX_FILE"
-
+echo "Installed new index.html â†’ $INDEX_FILE"
 # Create spare copy of the new file
 if [[ ! -f "$INDEX_SPARE" ]]; then
     cp -v "$INDEX_FILE" "$INDEX_SPARE"
     echo "Spare copy created: $INDEX_SPARE"
 else
-    echo "Spare copy $INDEX_SPARE already exists – skipping"
+    echo "Spare copy $INDEX_SPARE already exists   →skipping"
 fi
-
 # STEP 12. Create sudoers rule for www-data
 echo_step "12. Creating sudoers rule for www-data (/etc/sudoers.d/99-supermon-announcements)"
 SUDOERS_FILE="/etc/sudoers.d/99-supermon-announcements"
 # if [[ -f "$SUDOERS_FILE" ]]; then
-#    echo "$SUDOERS_FILE already exists – skipping"
+#    echo "$SUDOERS_FILE already exists   →skipping"
 # else
     cat > "$SUDOERS_FILE" << 'EOF'
 # /etc/sudoers.d/99-supermon-announcements
@@ -467,35 +481,30 @@ www-data ALL=(root) NOPASSWD: /bin/rm /usr/local/share/asterisk/sounds/announcem
 www-data ALL=(ALL) NOPASSWD: /etc/asterisk/local/playglobal.sh
 www-data ALL=(root) NOPASSWD: /etc/asterisk/local/polite_play.sh
 www-data ALL=(root) NOPASSWD: /etc/asterisk/local/polite_global.sh
-
 EOF
     chmod 0440 "$SUDOERS_FILE"
     chown root:root "$SUDOERS_FILE"
     echo "Sudoers file created successfully."
 # fi
-
 # STEP 13. Install Piper TTS 1.2.0 (amd64 or arm64)
 echo_step "13. Installing Piper TTS 1.2.0"
-
 # Detect architecture
 ARCH=$(uname -m)
 if [[ "$ARCH" == "x86_64" || "$ARCH" == "amd64" ]]; then
     PIPER_FILE="piper_amd64.tar.gz"
-    echo "Detected x86_64 architecture – using amd64 binary"
+    echo "Detected x86_64 architecture   using amd64 binary"
 elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
     PIPER_FILE="piper_arm64.tar.gz"
-    echo "Detected aarch64/arm64 architecture – using arm64 binary"
+    echo "Detected aarch64/arm64 architecture   using arm64 binary"
 else
     echo "Error: Unsupported architecture: $ARCH"
     exit 1
 fi
-
 # Piper binary path (note the nested piper/piper)
 PIPER_BIN="/opt/piper/bin/piper/piper"
-
 # Install Piper binary only if missing
 if [[ -f "$PIPER_BIN" && -x "$PIPER_BIN" ]]; then
-    echo "Piper binary already installed at $PIPER_BIN – skipping download"
+    echo "Piper binary already installed at $PIPER_BIN   →skipping download"
 else
     echo "Downloading and installing Piper binary..."
     sudo wget https://github.com/rhasspy/piper/releases/download/v1.2.0/$PIPER_FILE -O /tmp/piper.tar.gz
@@ -505,26 +514,22 @@ else
     rm -f /tmp/piper.tar.gz
     echo "Piper binary installed at $PIPER_BIN"
 fi
-
 # Create voices directory
 sudo mkdir -p /opt/piper/voices
 cd /opt/piper/voices
-
 # Function to download a voice if missing (same as before)
 download_voice() {
     local onnx_file="$1"
     local json_file="${onnx_file}.json"
     local base_url="https://huggingface.co/rhasspy/piper-voices/resolve/main"
-
     if [[ -f "$onnx_file" && -f "$json_file" ]]; then
-        echo "Voice $onnx_file already exists – skipping"
+        echo "Voice $onnx_file already exists   →skipping"
     else
         echo "Downloading voice: $onnx_file"
         sudo wget -4 "$base_url/$2" -O "$onnx_file"
         sudo wget -4 "$base_url/$3" -O "$json_file"
     fi
 }
-
 # Download voices only if missing
 download_voice "en_US-lessac-medium.onnx"     "en/en_US/lessac/medium/en_US-lessac-medium.onnx"     "en/en_US/lessac/medium/en_US-lessac-medium.onnx.json"
 download_voice "en_US-joe-medium.onnx"        "en/en_US/joe/medium/en_US-joe-medium.onnx"          "en/en_US/joe/medium/en_US-joe-medium.onnx.json"
@@ -532,11 +537,9 @@ download_voice "en_US-amy-medium.onnx"        "en/en_US/amy/medium/en_US-amy-med
 download_voice "en_US-kristin-medium.onnx"    "en/en_US/kristin/medium/en_US-kristin-medium.onnx"  "en/en_US/kristin/medium/en_US-kristin-medium.onnx.json"
 download_voice "en_US-libritts_r-medium.onnx" "en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx" "en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx.json"
 download_voice "en_US-ryan-low.onnx"          "en/en_US/ryan/low/en_US-ryan-low.onnx"              "en/en_US/ryan/low/en_US-ryan-low.onnx.json"
-
 # Set permissions
 sudo chown www-data:www-data *.onnx *.onnx.json 2>/dev/null || true
 sudo chmod 644 *.onnx *.onnx.json 2>/dev/null || true
-
 # === Set slower speaking rate for lessac (only if the file exists) ===
 if [[ -f "/opt/piper/voices/en_US-lessac-medium.onnx.json" ]]; then
     echo "Setting Piper voice speed (length_scale = 1.2) for lessac-medium"
@@ -551,21 +554,17 @@ if [[ -f "/opt/piper/voices/en_US-lessac-medium.onnx.json" ]]; then
         echo "Warning: length_scale was not changed"
     fi
 fi
-
 echo "Piper TTS setup completed."
 # STEP 14. Download piper_generate.php and piper_prompt_tts.sh
 echo_step "14. Downloading piper_prompt_tts.sh"
-
-
 if [[ -f "/usr/local/bin/piper_prompt_tts.sh" ]]; then
-    echo "/usr/local/bin/piper_prompt_tts.sh already exists – skipping"
+    echo "/usr/local/bin/piper_prompt_tts.sh already exists   →skipping"
 else
     sudo wget -O /usr/local/bin/piper_prompt_tts.sh https://raw.githubusercontent.com/n5ad/announcement-manager/main/piper_prompt_tts.sh
     sudo chown root:root /usr/local/bin/piper_prompt_tts.sh
     sudo chmod +x /usr/local/bin/piper_prompt_tts.sh
     echo "piper_prompt_tts.sh downloaded and made executable."
 fi
-
 # STEP 15. Test Piper installation
 echo_step "15. Testing Piper installation"
 /opt/piper/bin/piper/piper --version
@@ -573,8 +572,6 @@ echo "This is a test of Piper TTS on node $(hostname)" | \
 /opt/piper/bin/piper/piper --model /opt/piper/voices/en_US-lessac-medium.onnx --output_file /mp3/piper_test.wav
 ls -l /mp3/piper_test.wav
 
-# STEP 16. Final verification
-echo_step "16. Setup complete – verification"
 echo "I hope you get a lot of use from this"
-echo "Log into Supermon or Allmon3 → Announcements Manager should now appear at the bottom."
-echo "73 — N5AD"
+echo "Log into Supermon or Allmon3 and Announcements Manager should now appear at the bottom."
+echo "73  N5AD"
