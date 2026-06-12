@@ -38,7 +38,7 @@
             <option value="/opt/piper/voices/en_US-joe-medium.onnx">Joe (American male)</option>
             <option value="/opt/piper/voices/en_US-amy-medium.onnx">Amy (American female)</option>
             <option value="/opt/piper/voices/en_US-kristin-medium.onnx">Kristin (American female)</option>
-            <option value="/opt/piper/voices/en_US-libritts_r-medium.onnx">Libritts_r (British female)</option>
+            <option value="/opt/piper/voices/en_US-libritts_r-medium.onnx">Libritts (British female)</option>
             <option value="/opt/piper/voices/en_US-ryan-low.onnx">Ryan (British female)</option>
         </select>
         <br><br>
