@@ -1,4 +1,5 @@
 <?php
+// updated June 12, 2026 by N5AD
 if (!isset($_POST['raw_line'])) {
     echo "Error: Missing cron line";
     exit;
