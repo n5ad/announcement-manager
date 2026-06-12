@@ -1,7 +1,7 @@
 <?php
 // announcement.inc
 // Loaded only after Supermon login
-// Created by N5AD - Updated June 2026
+// Created by N5AD - Updated June 12,2026
 ?>
 <?php if (isset($_SESSION['sm61loggedin']) && $_SESSION['sm61loggedin'] === true) { ?>
 <div id="announcement-manager" style="
