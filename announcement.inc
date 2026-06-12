@@ -141,7 +141,7 @@ $(document).ready(function () {
     function loadMP3Dropdown() {
         $.getJSON("custom/list_mp3.php", function(files) {
             $("#mp3_select").empty().append(
-                $("<option>").val("").text("-- Select Audio File (MP3-WAV) --")
+                $("<option>").val("").text("-- Select Audio File --")
             );
             files.forEach(function(f) {
                 $("#mp3_select").append($("<option>").val(f).text(f));
@@ -181,7 +181,7 @@ $("#upload_btn").click(function() {
             loadMP3Dropdown();   // Refresh the MP3 list
         },
         error: function() {
-            $("#upload_status").text("ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€¦Ã¢â‚¬â„¢ Upload failed.").css("color", "red");
+            $("#upload_status").text(" Upload failed.").css("color", "red");
         }
     });
 });
