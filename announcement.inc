@@ -34,12 +34,12 @@
         
         <label for="tts_voice">Voice Model:</label><br>
         <select id="tts_voice" class="submit" style="width: 320px;">
-            <option value="/opt/piper/voices/en_US-lessac-medium.onnx">Lessac (Medium, American female)</option>
-            <option value="/opt/piper/voices/en_US-joe-medium.onnx">Joe (Medium, American male)</option>
-            <option value="/opt/piper/voices/en_US-amy-medium.onnx">Amy (Medium, American female)</option>
-            <option value="/opt/piper/voices/en_US-kristin-medium.onnx">Kristin (Medium, American female)</option>
-            <option value="/opt/piper/voices/en_US-libritts_r-medium.onnx">Libritts_r (Medium, British female)</option>
-            <option value="/opt/piper/voices/en_US-ryan-low.onnx">Ryan (low, British female)</option>
+            <option value="/opt/piper/voices/en_US-lessac-medium.onnx">Lessac (American female)</option>
+            <option value="/opt/piper/voices/en_US-joe-medium.onnx">Joe (American male)</option>
+            <option value="/opt/piper/voices/en_US-amy-medium.onnx">Amy (American female)</option>
+            <option value="/opt/piper/voices/en_US-kristin-medium.onnx">Kristin (American female)</option>
+            <option value="/opt/piper/voices/en_US-libritts_r-medium.onnx">Libritts_r (British female)</option>
+            <option value="/opt/piper/voices/en_US-ryan-low.onnx">Ryan (British female)</option>
         </select>
         <br><br>
         
@@ -88,7 +88,7 @@
         
         <div style="margin:15px 0;">
             <input type="button" class="submit" value="Install Announcement" id="install_announcement">
-            <input type="button" class="submit" value="Delete MP3" id="delete_mp3" style="background-color:#dc3545; color:white;">
+            <input type="button" class="submit" value="Delete" id="delete_mp3" style="background-color:#dc3545; color:white;">
             <input type="button" class="submit" value="Local Play" id="local_play_mp3" style="background:#28a745;color:white;">
             <input type="button" class="submit" value="Global Play" id="global_play_mp3" style="background:#fd7e14;color:white;">
         </div>
@@ -99,7 +99,7 @@
         
         <div style="margin:12px 0;">
             <input type="button" class="submit" value="Play Now" id="run_ul">
-            <input type="button" class="submit" value="Delete UL" id="delete_ul" style="background-color:#dc3545; color:white;">
+            <input type="button" class="submit" value="Delete" id="delete_ul" style="background-color:#dc3545; color:white;">
         </div>
     </div>
     <!-- ====================== CRON MANAGER ====================== -->
