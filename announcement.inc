@@ -188,7 +188,7 @@ $("#upload_btn").click(function() {
     // ==================== Button Handlers ====================
     $("#delete_mp3").click(function() {
         let mp3 = $("#mp3_select").val();
-        if (!mp3) { alert("Select an MP3 file."); return; }
+        if (!mp3) { alert("Select Audio file."); return; }
         if (!confirm("Delete '" + mp3 + "'?")) return;
         $.post("custom/delete_file.php", { type: "mp3", file: mp3 }, function(data) {
             alert(data);
@@ -197,26 +197,26 @@ $("#upload_btn").click(function() {
     });
     $("#local_play_mp3").click(function() {
         let f = $("#mp3_select").val();
-        if (!f) { alert("Select an MP3/WAV file first"); return; }
+        if (!f) { alert("Select Audio file first"); return; }
         $.post("/supermon/custom/run_announcement.php", { file: f, source: "mp3" }, function(r){ alert(r); })
         .fail(function() { alert("Local play failed."); });
     });
     $("#global_play_mp3").click(function() {
         let f = $("#mp3_select").val();
-        if (!f) { alert("Select an MP3/WAV file first"); return; }
+        if (!f) { alert("Select Audio file first"); return; }
         if (!confirm("WARNING: This will play on this node AND all linked nodes.\n\nContinue?")) return;
         $.post("/supermon/custom/globalplay.php", { file: f, source: "mp3" }, function(r){ alert(r); })
         .fail(function() { alert("Global play failed."); });
     });
     $("#run_ul").click(function() {
         let ulFile = $("#ul_select").val();
-        if (!ulFile) { alert("Select a UL file."); return; }
+        if (!ulFile) { alert("Select Audio file."); return; }
         $.post("/supermon/custom/run_announcement.php", { file: ulFile, source: "ul" }, function(data) { alert(data); })
         .fail(function() { alert("Play Now failed."); });
     });
     $("#delete_ul").click(function() {
         let ul = $("#ul_select").val();
-        if (!ul) { alert("Select a UL file."); return; }
+        if (!ul) { alert("Select Audio file."); return; }
         if (!confirm("Delete '" + ul + "' (.ul file)?")) return;
         $.post("custom/delete_file.php", { type: "ul", file: ul }, function(data) {
             alert(data);
@@ -247,7 +247,7 @@ $("#upload_btn").click(function() {
     // ==================== Install Announcement ====================
     $("#install_announcement").click(function() {
         let mp3 = $("#mp3_select").val();
-        if (!mp3) { alert("Select an MP3 file."); return; }
+        if (!mp3) { alert("Select Audio file."); return; }
         let min = prompt("Minute: Which minute of the hour do you want this to play?", "45"); if(min===null) return;
         let hour = prompt("Hour: Which hour or range of hours do you want this to play?\n* = every hour\nsingle= 12\nselected= 6,10,16\nrange= 7-20\nevery 2 hours between selected = 7-19/2", "7-20"); if(hour===null) return;
         let dom = prompt("DOM: Which day or range of days do you want this to play?\n* = everyday\n1-31\nselected= 1,7,23\nrange= 12-18", "*"); if(dom===null) return;
@@ -256,7 +256,7 @@ $("#upload_btn").click(function() {
         let week = "*";
         let useNth = false;
         if (/^[1-7]$/.test(dow.trim())) {
-            week = prompt("Week of month?\n* = every week\n1ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“5 = specific week", "*");
+            week = prompt("Week of month?\n* = every week\5 = specific week", "*");
             if (week === null) week = "*";
             week = week.trim();
             if (week !== "*" && week !== "" && /^[1-5]$/.test(week)) {
@@ -327,7 +327,7 @@ $("#upload_btn").click(function() {
                 row.append($("<td>").text(parts[3] || "*"));
                 row.append($("<td>").text(parts[4] || "*"));
                 row.append($("<td>").text(c.file));
-                row.append($("<td>").text(c.scope ? c.scope.toUpperCase() : "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â"));
+                row.append($("<td>").text(c.scope ? c.scope.toUpperCase() : ""));
                 row.append($("<td>").text(c.desc || ""));
                 let isEnabled = !c.raw.startsWith('#');
                 let toggleBtn = $("<button>")
