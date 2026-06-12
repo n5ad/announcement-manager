@@ -39,7 +39,7 @@
             <option value="/opt/piper/voices/en_US-amy-medium.onnx">Amy (Medium, American female)</option>
             <option value="/opt/piper/voices/en_US-kristin-medium.onnx">Kristin (Medium, American female)</option>
             <option value="/opt/piper/voices/en_US-libritts_r-medium.onnx">Libritts_r (Medium, British female)</option>
-            <option value="/opt/piper/voices/en_US-ryan-high.onnx">Ryan (High, British female)</option>
+            <option value="/opt/piper/voices/en_US-ryan-low.onnx">Ryan (low, British female)</option>
         </select>
         <br><br>
         
