@@ -1,8 +1,9 @@
 <?php
 
-// list_ul.php
-
-// CREATED BY N5AD
+/*
+ * Updated June 12, 2026
+ * Modified by N5AD
+ */
 
 $SOUNDS_DIR = '/usr/local/share/asterisk/sounds/announcements';
 
