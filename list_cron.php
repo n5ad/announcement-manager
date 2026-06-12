@@ -1,15 +1,8 @@
 <?php
 
 /*
-
- * list_cron.php
-
- * Lists AllStar announcement cron jobs 
-
- * Now shows ALL jobs using: playaudio.sh, globalplay.sh, polite_play.sh, polite_global.sh
-
- * CREATED BY N5AD
-
+ * Updated June 12, 2026
+ * Modified by N5AD
  */
 
 
