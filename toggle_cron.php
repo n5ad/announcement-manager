@@ -1,6 +1,8 @@
 <?php
-// toggle_cron.php - Enable/Disable a cron job by commenting/uncommenting the line
-
+/*
+ * Updated June 12, 2026
+ * Modified by N5AD
+ */
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo "Method not allowed.";
