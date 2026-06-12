@@ -1,9 +1,7 @@
 <?php
-/**
- * custom/update_announcement.php
- * this will convert an advanced cron job to a simple cronjob
- * if the single DOW is changed to multiple DOW
- * created by N5AD February 2026
+/*
+ * Updated June 12, 2026
+ * Modified by N5AD
  */
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
