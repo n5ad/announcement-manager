@@ -139,7 +139,6 @@ $(document).ready(function () {
                     .css({ 
                         "background-color": isEnabled ? "#28a745" : "#dc3545", 
                         "color": "white", 
-                        "border": "5px solid " + (isEnabled ? "#218838" : "#c82333"), 
                         "margin-right": "8px"
                     })
                     .click(function() {
