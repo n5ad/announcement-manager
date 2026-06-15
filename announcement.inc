@@ -135,7 +135,7 @@
         </table>
     </div>
 </div> <!-- End #announcement-manager -->
-<!-- ====================== JAVASCRIPT (unchanged except minor cleanup) ====================== -->
+
 <script>
 $(document).ready(function () {
     function loadMP3Dropdown() {
@@ -178,7 +178,7 @@ $("#upload_btn").click(function() {
         contentType: false,
         success: function(response) {
             $("#upload_status").html(response).css("color", "green");
-            loadMP3Dropdown();   // Refresh the MP3 list
+            loadMP3Dropdown();  
         },
         error: function() {
             $("#upload_status").text(" Upload failed.").css("color", "red");
