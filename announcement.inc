@@ -12,7 +12,7 @@
     margin-top: 25px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 ">
-    <!-- Added for table centering and button consistency -->
+    <!-- Cron table layout -->
     <style>
         #cron_table td,
         #cron_table th {
