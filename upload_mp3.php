@@ -50,7 +50,7 @@ exec($cmd, $output, $retval);
 unlink($tmp_input);
 
 if ($retval !== 0 || !file_exists($output_file)) {
-    echo "❌ Conversion failed.<br>";
+    echo " Conversion failed.<br>";
     echo "<pre>" . htmlspecialchars(implode("\n", $output)) . "</pre>";
     exit;
 }
@@ -61,7 +61,7 @@ chmod($output_file, 0664);
 /* Change owner if desired */
 @chown($output_file, 'http');
 
-echo "✅ Uploaded and converted successfully: " .
+echo " Uploaded and converted successfully: " .
      htmlspecialchars(basename($output_file));
 
 ?>
