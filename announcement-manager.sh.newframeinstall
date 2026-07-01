@@ -23,13 +23,12 @@ set -euo pipefail
 # CONFIG
 
 REPO_URL="https://github.com/n5ad/announcement-manager.git"
-TEMP_CLONE="/tmp/supermon-announcements"
-TARGET_DIR="/var/www/html/supermon/custom"
-LINK_PHP="/var/www/html/supermon/link.php"
+TEMP_CLONE="/tmp/announcement-manager"
+TARGET_DIR="/var/www/html/announcement-manager"
 MP3_DIR="/mp3"
 LOCAL_DIR="/etc/asterisk/local"
 ANNOUNCE_DIR="/usr/local/share/asterisk/sounds/announcements"
-ALLMON_DIR="/usr/share/allmon3/custom"
+
 #
 # Helpers
 # 
@@ -51,12 +50,11 @@ if ! command -v git >/dev/null 2>&1; then
 fi
  
 echo ""
-echo "Supermon Announcements Manager - Full Setup"
+echo " Announcements Manager - Full Setup"
 echo "GitHub Repo: $REPO_URL"
 echo "Target dir: $TARGET_DIR"
 echo "MP3 dir: $MP3_DIR"
 echo "Local scripts dir: $LOCAL_DIR"
-echo "link.php location: $LINK_PHP"
 echo ""
 echo -n "Continue setup? (y/N) "
 read -r answer
@@ -74,27 +72,15 @@ echo "Using node number: $NODE_NUMBER"
 echo_step "3. Cloning GitHub repo"
 rm -rf "$TEMP_CLONE"
 git clone --depth 1 "$REPO_URL" "$TEMP_CLONE" || error "Git clone failed"
+
 # STEP 4. Copy PHP & inc files
 echo_step "4. Copying files to $TARGET_DIR"
 mkdir -p "$TARGET_DIR"
 cp -v "$TEMP_CLONE"/*.{php,inc} "$TARGET_DIR"/ 2>/dev/null || warn "No .php/.inc files found"
 rm -rf "$TEMP_CLONE"
-# STEP 5 Copy announcement include to Allmon3 custom directory (copy, not move)
-echo_step "5 Copying announcement include to Allmon3 custom dir ($ALLMON_DIR)"
-mkdir -p "$ALLMON_DIR"
-# Source file after Supermon copy
-SOURCE_INC="$TARGET_DIR/allmon-announcement.inc"
-if [[ -f "$SOURCE_INC" ]]; then
-    # Copy (preserves Supermon version)
-    cp -v "$SOURCE_INC" "$ALLMON_DIR/allmon-announcement.inc"
-    chown root:root "$ALLMON_DIR/allmon-announcement.inc"
-    chmod 644 "$ALLMON_DIR/allmon-announcement.inc"
-    echo "Copied $SOURCE_INC â†’ $ALLMON_DIR"
-else
-    warn "Source file $SOURCE_INC not found  →skipping Allmon3 copy (check repo contents)"
-fi
-# STEP 6. Create /mp3 dir + permissions
-echo_step "6. Creating /mp3 directory"
+
+# STEP 5. Create /mp3 dir + permissions
+echo_step "5. Creating /mp3 directory"
 mkdir -p "$MP3_DIR"
 MP3_USER="${SUDO_USER:-$(whoami)}"
 echo "Granting /mp3 access to user: $MP3_USER"
@@ -107,18 +93,21 @@ fi
 chown -R www-data:www-data "$MP3_DIR"
 chmod -R 2775 "$MP3_DIR"
 echo "MP3 directory permissions set with setgid. $MP3_USER can now access /mp3."
-# STEP 7. Set ownership & permissions on custom files
-echo_step "7 Setting ownership & permissions"
+
+# STEP 6. Set ownership & permissions on custom files
+echo_step "6. Setting ownership & permissions"
 chown -R www-data:www-data "$TARGET_DIR"
 find "$TARGET_DIR" -type f -name "*.php" -exec chmod 644 {} \;
 find "$TARGET_DIR" -type f -name "*.inc" -exec chmod 644 {} \;
-# STEP 8. Create Announcements dir + permissions
-echo_step "8. Creating Announcements dir + permissions"
+
+# STEP 7. Create Announcements dir + permissions
+echo_step "7. Creating Announcements dir + permissions"
 mkdir -p "$ANNOUNCE_DIR"
 chown -R www-data:www-data "$ANNOUNCE_DIR"
 chmod -R 2775 "$ANNOUNCE_DIR"
-# STEP 9. Install prerequisite scripts in /etc/asterisk/local/ (if missing)
-echo_step "9. Installing prerequisite scripts in $LOCAL_DIR"
+
+# STEP 8. Install prerequisite scripts in /etc/asterisk/local/ (if missing)
+echo_step "8. Installing prerequisite scripts in $LOCAL_DIR"
 mkdir -p "$LOCAL_DIR"
 chown asterisk:asterisk "$LOCAL_DIR" 2>/dev/null || chown root:root "$LOCAL_DIR"
 chmod 755 "$LOCAL_DIR"
@@ -290,8 +279,9 @@ else
 fi
 chmod +x "$PLAY_SCRIPT" "$CONVERT_SCRIPT" 2>/dev/null || true
 echo "Verified: Both scripts are executable."
-# STEP 10. Safely patch link.php to include announcement manager (instead of full overwrite)
-echo_step "10. Updating footer.inc and restoring link.php (Announcement Manager integration)"
+
+# STEP 9. Safely patch link.php to include announcement manager (instead of full overwrite)
+echo_step "9. Updating footer.inc and restoring link.php (Announcement Manager integration)"
 
 # Define paths
 LINK_PHP="/var/www/html/supermon/link.php"
@@ -337,7 +327,7 @@ else
     cp -v "$FOOTER_INC" "$BACKUP_FOOTER"
     echo "Backup of footer.inc created: $BACKUP_FOOTER"
 
-    if grep -q 'include_once.*custom/announcement\.inc' "$FOOTER_INC"; then
+    if grep -q 'include_once.*/announcement-manager/announcement\.inc' "$FOOTER_INC"; then
         echo "Announcement include already present — →skipping"
     else
         echo "Patching footer.inc..."
@@ -352,7 +342,7 @@ else
         # When we find the closing ?> while inside the block, insert after it
         inblock && /^\s*\?>\s*$/ {
             print
-            print "<?php include_once \"custom/announcement.inc\"; ?> <br><br>"
+            print "<?php include_once \"/announcement-manager/announcement.inc\"; ?> <br><br>"
             inblock = 0
             next
         }
@@ -431,37 +421,7 @@ EOF
     
     echo "Preferred IPv4 LAN block inserted successfully."
 fi
-# STEP 11 Install custom index.html for Allmon3 web root
-echo_step "11 Installing custom index.html for Allmon3 (/usr/share/allmon3/)"
-ALLMON_WEB_ROOT="/usr/share/allmon3"
-INDEX_FILE="$ALLMON_WEB_ROOT/index.html"
-INDEX_ORIG="$ALLMON_WEB_ROOT/index.html.orig"
-INDEX_SPARE="$ALLMON_WEB_ROOT/index.html.spare"
-mkdir -p "$ALLMON_WEB_ROOT"
-# Backup existing index.html if it exists
-if [[ -f "$INDEX_FILE" ]]; then
-    if [[ ! -f "$INDEX_ORIG" ]]; then
-        cp -v "$INDEX_FILE" "$INDEX_ORIG"
-        echo "Backup created: $INDEX_ORIG"
-    else
-        echo "Original backup $INDEX_ORIG already exists   →skipping backup"
-    fi
-fi
-# Download fresh index.html from repo (raw URL)
-INDEX_URL="https://raw.githubusercontent.com/n5ad/announcement-manager/main/index.html"
-wget -O "$INDEX_FILE.tmp" "$INDEX_URL" || error "Failed to download index.html from repo"
-# Install it
-mv "$INDEX_FILE.tmp" "$INDEX_FILE"
-chown root:root "$INDEX_FILE"
-chmod 644 "$INDEX_FILE"
-echo "Installed new index.html â†’ $INDEX_FILE"
-# Create spare copy of the new file
-if [[ ! -f "$INDEX_SPARE" ]]; then
-    cp -v "$INDEX_FILE" "$INDEX_SPARE"
-    echo "Spare copy created: $INDEX_SPARE"
-else
-    echo "Spare copy $INDEX_SPARE already exists   →skipping"
-fi
+
 # STEP 12. Create sudoers rule for www-data
 echo_step "12. Creating sudoers rule for www-data (/etc/sudoers.d/99-supermon-announcements)"
 SUDOERS_FILE="/etc/sudoers.d/99-supermon-announcements"
