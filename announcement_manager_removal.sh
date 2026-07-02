@@ -62,8 +62,10 @@ echo "Removing scripts in /etc/asterisk/local..."
 sudo rm -f /etc/asterisk/local/announcemenet_manager.sh
 
 sudo rm -f /etc/asterisk/local/playaudio.sh
-
+sudo rm -f /etc/asterisk/local/playglobal.sh
 sudo rm -f /etc/asterisk/local/audio_convert.sh
+sudo rm -f /etc/asterisk/local/polite_play.sh
+sudo rm -f /etc/asterisk/local/polite_global.sh
 
 
 # 3. Remove sudoers rule
@@ -96,9 +98,9 @@ sudo rm -rf /opt/piper
 
 echo "Removing files in /var/www/html/supermon/custom/..."
 
-sudo rm -f /var/www/html/supermon/custom/*.php
 
-sudo rm -f /var/www/html/supermon/custom/*.inc
+sudo rm -rf /var/www/html/supermon/custom
+
 
 #8. Restore Allmon3 index.html
 echo "Restoring Allmon3 Dashboard"
