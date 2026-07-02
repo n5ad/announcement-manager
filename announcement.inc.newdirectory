@@ -149,7 +149,7 @@ $(document).ready(function () {
     }
     loadMP3Dropdown();
     function loadULDropdown() {
-        $.getJSON("announcement-manager/list_ul.php", function(files) {
+        $.getJSON("/announcement-manager/list_ul.php", function(files) {
             $("#ul_select").empty().append(
                 $("<option>").val("").text("-- Select Announcement --")
             );
