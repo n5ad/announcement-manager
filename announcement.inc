@@ -138,7 +138,7 @@
 <script>
 $(document).ready(function () {
     function loadMP3Dropdown() {
-        $.getJSON("custom/list_mp3.php", function(files) {
+        $.getJSON("/announcement-manager/list_mp3.php", function(files) {
             $("#mp3_select").empty().append(
                 $("<option>").val("").text("-- Select Audio File --")
             );
@@ -149,7 +149,7 @@ $(document).ready(function () {
     }
     loadMP3Dropdown();
     function loadULDropdown() {
-        $.getJSON("custom/list_ul.php", function(files) {
+        $.getJSON("announcement-manager/list_ul.php", function(files) {
             $("#ul_select").empty().append(
                 $("<option>").val("").text("-- Select Announcement --")
             );
@@ -170,7 +170,7 @@ $("#upload_btn").click(function() {
     formData.append("file", fileInput.files[0]);
     $("#upload_status").text("Uploading...").css("color", "orange");
     $.ajax({
-        url: "custom/upload_mp3.php",
+        url: "/announcement-manager/upload_mp3.php",
         type: "POST",
         data: formData,
         processData: false,
@@ -189,7 +189,7 @@ $("#upload_btn").click(function() {
         let mp3 = $("#mp3_select").val();
         if (!mp3) { alert("Select Audio file."); return; }
         if (!confirm("Delete '" + mp3 + "'?")) return;
-        $.post("custom/delete_file.php", { type: "mp3", file: mp3 }, function(data) {
+        $.post("/announcement-manager/delete_file.php", { type: "mp3", file: mp3 }, function(data) {
             alert(data);
             loadMP3Dropdown();
         }).fail(function() { alert("Delete failed."); });
@@ -197,27 +197,27 @@ $("#upload_btn").click(function() {
     $("#local_play_mp3").click(function() {
         let f = $("#mp3_select").val();
         if (!f) { alert("Select Audio file first"); return; }
-        $.post("/supermon/custom/run_announcement.php", { file: f, source: "mp3" }, function(r){ alert(r); })
+        $.post("/announcement-manager/run_announcement.php", { file: f, source: "mp3" }, function(r){ alert(r); })
         .fail(function() { alert("Local play failed."); });
     });
     $("#global_play_mp3").click(function() {
         let f = $("#mp3_select").val();
         if (!f) { alert("Select Audio file first"); return; }
         if (!confirm("WARNING: This will play on this node AND all linked nodes.\n\nContinue?")) return;
-        $.post("/supermon/custom/globalplay.php", { file: f, source: "mp3" }, function(r){ alert(r); })
+        $.post("/announcement-manager/globalplay.php", { file: f, source: "mp3" }, function(r){ alert(r); })
         .fail(function() { alert("Global play failed."); });
     });
     $("#run_ul").click(function() {
         let ulFile = $("#ul_select").val();
         if (!ulFile) { alert("Select Audio file."); return; }
-        $.post("/supermon/custom/run_announcement.php", { file: ulFile, source: "ul" }, function(data) { alert(data); })
+        $.post("/announcement-manager/run_announcement.php", { file: ulFile, source: "ul" }, function(data) { alert(data); })
         .fail(function() { alert("Play Now failed."); });
     });
     $("#delete_ul").click(function() {
         let ul = $("#ul_select").val();
         if (!ul) { alert("Select Audio file."); return; }
         if (!confirm("Delete '" + ul + "' (.ul file)?")) return;
-        $.post("custom/delete_file.php", { type: "ul", file: ul }, function(data) {
+        $.post("/announcement-manager/delete_file.php", { type: "ul", file: ul }, function(data) {
             alert(data);
             loadULDropdown();
         }).fail(function() { alert("Delete failed."); });
@@ -230,7 +230,7 @@ $("#upload_btn").click(function() {
         if (!filename) { alert("Enter a filename."); return; }
         if (!confirm("Generate '" + filename + ".wav'?")) return;
         $("#tts_status").text("Generating...").css("color", "#28a745");
-        $.post("custom/piper_generate.php", { text: text, filename: filename, voice: voice })
+        $.post("/announcement-manager/piper_generate.php", { text: text, filename: filename, voice: voice })
         .done(function(resp) {
             $("#tts_status").text(resp);
             if (resp.toLowerCase().includes("success")) {
@@ -296,7 +296,7 @@ $("#upload_btn").click(function() {
         if (modeChoice === null) return;
         let mode = (modeChoice.trim().toLowerCase() === "priority") ? "priority" : "polite";
         // Send to announcement.php
-        $.post("custom/announcement.php", {
+        $.post("/announcement-manager/announcement.php", {
             file: mp3,
             min, hour, dom, month, dow, week,
             use_nth: useNth ? 1 : 0,
@@ -314,7 +314,7 @@ $("#upload_btn").click(function() {
     });
     // ==================== Load Cron List ====================
     function loadCronList() {
-        $.getJSON("custom/list_cron.php", function(crons) {
+        $.getJSON("/announcement-manager/list_cron.php", function(crons) {
             let table = $("#cron_table tbody");
             table.empty();
             crons.forEach(function(c) {
@@ -341,7 +341,7 @@ $("#upload_btn").click(function() {
                     .click(function() {
                         let newState = !isEnabled;
                         if (!confirm(`Really ${newState ? "enable" : "disable"} "${c.file}"?`)) return;
-                        $.post("custom/toggle_cron.php", { raw_line: c.raw, enable: newState ? 1 : 0 }, function(data) {
+                        $.post("/announcement-manager/toggle_cron.php", { raw_line: c.raw, enable: newState ? 1 : 0 }, function(data) {
                             alert(data);
                             loadCronList();
                         });
@@ -354,7 +354,7 @@ $("#upload_btn").click(function() {
                     .click(function() {
                         let scope = c.scope || "local";
                         if (!confirm("Play '" + c.file + "' now?\n\nScope: " + scope.toUpperCase())) return;
-                        $.post("custom/run_announcement.php", {
+                        $.post("/announcement-manager/run_announcement.php", {
                             file: c.file,
                             scope: scope
                         }, function(data) {
@@ -374,7 +374,7 @@ $("#upload_btn").click(function() {
                     let dom = prompt("DOM:", parts[2]); if(dom===null) return;
                     let month = prompt("Month:", parts[3]); if(month===null) return;
                     let dow = prompt("DOW:", parts[4]); if(dow===null) return;
-                    $.post("custom/update_announcement.php", {
+                    $.post("/announcement-manager/update_announcement.php", {
                         raw_line: c.raw,
                         min, hour, dom, month, dow
                     }, function(resp) {
@@ -386,7 +386,7 @@ $("#upload_btn").click(function() {
                 });
                 let delBtn = $("<button>").text("Delete").css({ "background": "#dc3545", "color": "white" }).click(function() {
                     if (!confirm("Delete " + c.file + "?")) return;
-                    $.post("custom/delete_announcement.php", { raw_line: c.raw }, function(data) {
+                    $.post("/announcement-manager/delete_announcement.php", { raw_line: c.raw }, function(data) {
                         alert(data);
                         loadCronList();
                     });
