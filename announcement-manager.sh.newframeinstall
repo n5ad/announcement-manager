@@ -342,8 +342,8 @@ else
         # When we find the closing ?> while inside the block, insert after it
         inblock && /^\s*\?>\s*$/ {
             print
-            print "<?php include_once \"/announcement-manager/announcement.inc\"; ?> <br><br>"
-            inblock = 0
+y
+inblock = 0
             next
         }
         { print }
