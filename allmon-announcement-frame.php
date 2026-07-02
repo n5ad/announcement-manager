@@ -88,7 +88,7 @@ if (!isAllmon3LoggedIn()) {
 <body>
     <div class="container">
         <h1>Announcement Manager</h1>
-        <?php include '/var/www/html/supermon/custom/allmon-announcement.inc'; ?>
+        <?php include '/var/www/html/announcement-manager/allmon-announcement.inc'; ?>
     </div>
 </body>
 </html>
