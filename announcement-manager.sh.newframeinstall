@@ -1,23 +1,21 @@
 #!/usr/bin/env bash
 #
-# setup-supermon-announcements.sh
-# Fully automates Supermon Announcements Manager setup:
+# 
+# - Fully automates Announcements Manager setup for Allmon3 and Supermon+
 # - Installs required packages: sox + libsox-fmt-mp3 (for MP3 support) + git + perl
-# - Copies files from GitHub to /var/www/html/supermon/custom/
+# - Copies files from GitHub to /var/www/html/announcement-manager/
 # - Installs prerequisite scripts: playaudio.sh, playglobal.sh, polite_global, polite_play  & audio_convert.sh in /etc/asterisk/local/ (exact from KD5FMU repos and two custom by n5ad)
 # - Creates /mp3 directory with correct permissions (2775, setgid)
-# - Creates /usr/share/allmon3/custom directory with correct permissions and copies allmon-announcement.inc file there
 # - Automatically grants access to the invoking user
 # - Sets ownership & permissions on files
-# - Backs up old link.php to link.php.bak and installs new link.php from repo
-# - Backs up old index.html file to index.html.original installs new index.html and copy index.html.copy
+# - Removes old Announcement Manager installation if it exists
 # - Creates /etc/sudoers.d/99-supermon-announcements for www-data (passwordless access to required commands)
 # - Installs Piper TTS 1.2.0 ARM64 (binary + libs in /opt/piper/bin/, voices in /opt/piper/voices/)
 # - Downloads piper_generate.php and piper_prompt_tts.sh and makes them executable
 # - Safe & idempotent (can run multiple times)
 #
 # Run as root: sudo bash announcement_manager.sh
-# Author: N5AD - January 2026 (updated)
+# Author: N5AD - Januaary 2026 , July 2026 (updated)
 set -euo pipefail
 
 # CONFIG
@@ -28,7 +26,7 @@ TARGET_DIR="/var/www/html/announcement-manager"
 MP3_DIR="/mp3"
 LOCAL_DIR="/etc/asterisk/local"
 ANNOUNCE_DIR="/usr/local/share/asterisk/sounds/announcements"
-
+OLD_DIR="/var/www/html/supermon/custom"
 #
 # Helpers
 # 
@@ -105,6 +103,7 @@ echo_step "7. Creating Announcements dir + permissions"
 mkdir -p "$ANNOUNCE_DIR"
 chown -R www-data:www-data "$ANNOUNCE_DIR"
 chmod -R 2775 "$ANNOUNCE_DIR"
+sudo rm -rf "$OLD_DIR"
 
 # STEP 8. Install prerequisite scripts in /etc/asterisk/local/ (if missing)
 echo_step "8. Installing prerequisite scripts in $LOCAL_DIR"
