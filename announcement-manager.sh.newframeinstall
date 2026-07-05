@@ -66,6 +66,48 @@ if [[ ! "$NODE_NUMBER" =~ ^[0-9]+$ ]]; then
     error "Invalid node number! Please enter digits only."
 fi
 echo "Using node number: $NODE_NUMBER"
+
+# ====================== ADDING ALLMON3 IFRAME CONFIG ======================
+echo_step "Adding Allmon3 iframe entries for Announcement Manager"
+
+INI_FILE="/etc/allmon3/allmon3.ini"
+
+if [ ! -f "$INI_FILE" ]; then
+    echo "Warning: $INI_FILE not found. Skipping iframe configuration."
+else
+    if grep -q "^\[${NODE_NUMBER}\]" "$INI_FILE" && grep -q "iframepost" "$INI_FILE"; then
+        echo "Iframe entries already exist for node $NODE_NUMBER → skipping"
+    else
+        echo "Adding iframe lines under [${NODE_NUMBER}] ..."
+
+        awk -v node="$NODE_NUMBER" '
+        BEGIN { inserted=0 }
+        /^\[' node '\]/ {
+            print $0
+            next
+        }
+        # Insert right after the last key in the section (before next section)
+        /^\[/ {
+            if (inserted == 0) {
+                print "iframepost=/announcement-manager/allmon-announcement-frame.php"
+                print "iframepre=/supermon/usflag.jpg"
+                inserted=1
+            }
+        }
+        { print }
+        END {
+            if (inserted == 0) {
+                print "\n[" node "]"
+                print "iframepost=/announcement-manager/allmon-announcement-frame.php"
+                print "iframepre="
+            }
+        }
+        ' "$INI_FILE" > "$INI_FILE.tmp" && mv "$INI_FILE.tmp" "$INI_FILE"
+
+        echo "Successfully added iframe entries for node $NODE_NUMBER"
+    fi
+fi
+
 # STEP 3. Clone repo
 echo_step "3. Cloning GitHub repo"
 rm -rf "$TEMP_CLONE"
