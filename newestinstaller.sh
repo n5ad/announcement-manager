@@ -67,10 +67,22 @@ if [[ ! "$NODE_NUMBER" =~ ^[0-9]+$ ]]; then
 fi
 echo "Using node number: $NODE_NUMBER"
 
-# ====================== ADDING ALLMON3 IFRAME CONFIG ======================
-echo_step "Adding Allmon3 iframe entries for Announcement Manager"
+#!/bin/bash
+#
+
+# Standalone tester for the Allmon3 iframe insertion logic.
+# Prompts for a node number, backs up allmon3.ini, then applies the same
+# logic used in announcement_manager.sh.
+#
+
 
 INI_FILE="/etc/allmon3/allmon3.ini"
+
+
+
+
+
+echo "Using node number: $NODE_NUMBER"
 
 # --- Backup before touching the real file ---
 BACKUP_FILE="${INI_FILE}.bak.$(date +%Y%m%d-%H%M%S)"
@@ -134,6 +146,12 @@ else
     echo "Successfully added iframe entries for node $NODE_NUMBER"
 fi
 
+echo ""
+echo "=== Resulting $INI_FILE ==="
+cat "$INI_FILE"
+echo ""
+echo "=== Diff vs backup ==="
+diff -u "$BACKUP_FILE" "$INI_FILE" || true
 # STEP 3. Clone repo
 echo_step "3. Cloning GitHub repo"
 rm -rf "$TEMP_CLONE"
