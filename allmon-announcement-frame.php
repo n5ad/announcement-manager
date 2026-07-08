@@ -69,7 +69,7 @@ if (!isAllmon3LoggedIn()) {
             background: #f4f4f4;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
+            min-height: 1600px;
         }
         .container {
             width: 100%;
