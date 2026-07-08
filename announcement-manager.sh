@@ -69,7 +69,6 @@ echo "Using node number: $NODE_NUMBER"
 
 # ====================== ADDING ALLMON3 IFRAME CONFIG ======================
 echo_step "Adding Allmon3 iframe entries for Announcement Manager"
-
 INI_FILE="/etc/allmon3/allmon3.ini"
 
 if [ ! -f "$INI_FILE" ]; then
@@ -82,11 +81,12 @@ else
 
         awk -v node="$NODE_NUMBER" '
         BEGIN { inserted=0 }
-        /^\[' node '\]/ {
+        # Match the target section header
+        $0 ~ ("^\\[" node "\\]") {
             print $0
             next
         }
-        # Insert right after the last key in the section (before next section)
+        # When we hit the next section, insert before it if not already done
         /^\[/ {
             if (inserted == 0) {
                 print "iframepost=/announcement-manager/allmon-announcement-frame.php"
@@ -107,7 +107,6 @@ else
         echo "Successfully added iframe entries for node $NODE_NUMBER"
     fi
 fi
-
 # STEP 3. Clone repo
 echo_step "3. Cloning GitHub repo"
 rm -rf "$TEMP_CLONE"
