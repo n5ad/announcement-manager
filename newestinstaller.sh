@@ -15,7 +15,7 @@
 # - Safe & idempotent (can run multiple times)
 #
 # Run as root: sudo bash announcement_manager.sh
-# Author: N5AD - Januaary 2026 , July 2026 (updated)
+# Author: N5AD - January 2026 , July 2026 (updated)
 set -euo pipefail
 
 # CONFIG
@@ -67,20 +67,9 @@ if [[ ! "$NODE_NUMBER" =~ ^[0-9]+$ ]]; then
 fi
 echo "Using node number: $NODE_NUMBER"
 
-#!/bin/bash
-#
-
-# Standalone tester for the Allmon3 iframe insertion logic.
-# Prompts for a node number, backs up allmon3.ini, then applies the same
-# logic used in announcement_manager.sh.
-#
-
+# update allmon3.ini file for iframe insertion
 
 INI_FILE="/etc/allmon3/allmon3.ini"
-
-
-
-
 
 echo "Using node number: $NODE_NUMBER"
 
