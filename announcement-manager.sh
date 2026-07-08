@@ -74,32 +74,52 @@ INI_FILE="/etc/allmon3/allmon3.ini"
 if [ ! -f "$INI_FILE" ]; then
     echo "Warning: $INI_FILE not found. Skipping iframe configuration."
 else
-    if grep -q "^\[${NODE_NUMBER}\]" "$INI_FILE" && grep -q "iframepost" "$INI_FILE"; then
+    # --- Check if already configured ---
+    ALREADY_CONFIGURED=$(awk -v node="$NODE_NUMBER" '
+        BEGIN { in_section=0; found=0 }
+        {
+            if ($0 ~ "^\\[") {
+                if ($0 ~ "^\\[" node "\\]$") {
+                    in_section = 1
+                } else {
+                    in_section = 0
+                }
+            } else if (in_section && $0 ~ "^iframepost") {
+                found = 1
+            }
+        }
+        END { print found }
+    ' "$INI_FILE")
+
+    if [ "$ALREADY_CONFIGURED" = "1" ]; then
         echo "Iframe entries already exist for node $NODE_NUMBER → skipping"
     else
         echo "Adding iframe lines under [${NODE_NUMBER}] ..."
 
         awk -v node="$NODE_NUMBER" '
-        BEGIN { inserted=0 }
-        # Match the target section header
-        $0 ~ ("^\\[" node "\\]") {
-            print $0
-            next
-        }
-        # When we hit the next section, insert before it if not already done
-        /^\[/ {
-            if (inserted == 0) {
+        {
+            if (in_section && $0 ~ "^\\[") {
                 print "iframepost=/announcement-manager/allmon-announcement-frame.php"
                 print "iframepre=/supermon/usflag.jpg"
-                inserted=1
+                inserted = 1
+                in_section = 0
+            }
+            print $0
+            if ($0 ~ "^\\[" node "\\]$") {
+                in_section = 1
             }
         }
-        { print }
         END {
-            if (inserted == 0) {
-                print "\n[" node "]"
+            if (in_section && !inserted) {
                 print "iframepost=/announcement-manager/allmon-announcement-frame.php"
-                print "iframepre="
+                print "iframepre=/supermon/usflag.jpg"
+                inserted = 1
+            }
+            if (!inserted) {
+                print ""
+                print "[" node "]"
+                print "iframepost=/announcement-manager/allmon-announcement-frame.php"
+                print "iframepre=/supermon/usflag.jpg"
             }
         }
         ' "$INI_FILE" > "$INI_FILE.tmp" && mv "$INI_FILE.tmp" "$INI_FILE"
