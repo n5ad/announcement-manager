@@ -64,3 +64,9 @@ Then follow the promts.
 The cron table will only show the announcements that were created by this program. If you have announcements that you created by other means, they will not show up here.
 You can also schedule announcements for non standard times such as running an announcement on the second tuesday of every month. Just follow the prompts when you schedule the announcement. 
 You can also create an MP3 of your own voice and save that in the MP3 directory. This directory is user accessable via ssh and  you do not need any special permissions to place files there. 
+
+Once the installationis completed, you will need to restart allmon3.
+```
+sudo systemctl restart allmon3
+```
+Now you are good to go. 
