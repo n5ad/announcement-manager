@@ -389,8 +389,6 @@ BACKUP_SUFFIX=".bak.$(date +%Y%m%d-%H%M%S)"
 # === 1. Restore / Fix link.php to desired ending ===
 echo_step "10a. Restoring link.php - removing announcement if previously installed"
 
-LINK_PHP="/var/www/html/supermon/link.php"
-BACKUP_SUFFIX=".bak.$(date +%Y%m%d-%H%M%S)"
 
 if [ -f "$LINK_PHP" ]; then
     BACKUP_LINK="${LINK_PHP}${BACKUP_SUFFIX}"
