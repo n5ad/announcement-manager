@@ -26,6 +26,12 @@ sudo systemctl enable --now apache2
 
 
 Here is how to install it:
+
+You need to update for the new version for Allmon3 to work correctly. So...
+
+```
+sudo apt update && sudo apt upgrade -y
+```
 first lets get to s specific directory after you after started an SSH session into your node or from the terminal CLI if you like. 
 
 ```
