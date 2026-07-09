@@ -41,8 +41,8 @@ check_root
 echo_step "1. Installing required packages (sox, libsox-fmt-mp3, git, perl)"
 # sudo apt update && sudo apt upgrade -y || error "apt update failed. Check internet or sources.list."
 apt install -y git || error "Failed to install git. Check internet/apt sources."
-apt install -y sox libsox-fmt-mp3 perl || error "Failed to install other packages."
-echo "All required packages (sox, libsox-fmt-mp3, git, perl) installed or already present."
+apt install -y sox libsox-fmt-mp3 perl php-curl || error "Failed to install other packages."
+echo "All required packages (sox, libsox-fmt-mp3, git, perl, php-curl) installed or already present."
 if ! command -v git >/dev/null 2>&1; then
     error "git is still not installed after apt. Check your internet or apt sources."
 fi
