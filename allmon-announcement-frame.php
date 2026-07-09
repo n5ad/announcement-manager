@@ -1,16 +1,10 @@
 <?php
 // allmon-announcement-frame.php
 //
-// Security: Only allow access if the user is currently logged into Allmon3.
-// We verify this by calling Allmon3's own "master/auth/check" API endpoint
-// server-side, forwarding the browser's cookies exactly as the browser would.
-// This avoids guessing cookie names or reimplementing Allmon3's auth logic --
-// we simply ask Allmon3 itself "is this user logged in?" and trust its answer.
+
 
 function isAllmon3LoggedIn(): bool {
-    // Build the check URL from the current request so it works regardless of
-    // http/https or hostname. Adjust the path below (/allmon3/) if your
-    // Allmon3 install lives at a different URL path.
+  
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $checkUrl = "$scheme://$host/allmon3/master/auth/check";
@@ -22,15 +16,6 @@ function isAllmon3LoggedIn(): bool {
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER     => ["Cookie: $cookieHeader"],
         CURLOPT_TIMEOUT        => 3,
-        // NOTE: SSL verification is disabled here because this server is
-        // calling itself over its own IP-based/self-signed certificate,
-        // which cannot pass strict hostname verification. This is a
-        // server-to-self loopback call carrying only the cookie the
-        // browser already sent this same server -- not a third-party
-        // request -- so the usual MITM concern that peer verification
-        // protects against does not apply the same way here. If you later
-        // put a proper trusted certificate on this host, switch both of
-        // these back to true / 2.
         CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_SSL_VERIFYHOST => false,
     ]);
