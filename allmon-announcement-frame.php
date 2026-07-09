@@ -35,8 +35,8 @@ function isAllmon3LoggedIn(): bool {
 if (!isAllmon3LoggedIn()) {
     http_response_code(403);
     echo "<h2 style='text-align:center; color:red; margin-top:80px;'>Access Denied</h2>";
-    echo "<p style='text-align:center;'>You must be logged into Allmon3 to view this page.</p>";
-    echo "<p style='text-align:center;'><a href='/allmon3/'>&larr; Go to Allmon3</a></p>";
+    echo "<p style='text-align:center;'>Please log into Allmon3 then refresh the page.</p>";
+    
     exit;
 }
 ?>
