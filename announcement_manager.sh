@@ -634,6 +634,12 @@ echo "This is a test of Piper TTS on node $(hostname)" | \
 /opt/piper/bin/piper/piper --model /opt/piper/voices/en_US-lessac-medium.onnx --output_file /mp3/piper_test.wav
 ls -l /mp3/piper_test.wav
 
+# FINAL STEP: Restart services
+echo_step "16. Restarting services (Allmon3 + Apache2)"
+sudo systemctl restart allmon3
+sudo systemctl restart apache2
+
+
 echo "I hope you get a lot of use from this"
 echo "Log into Supermon or Allmon3 and Announcements Manager should now appear at the bottom."
 echo "73  N5AD"
