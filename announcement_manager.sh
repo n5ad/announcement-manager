@@ -127,7 +127,7 @@ else
             print ""
             print "[" node "]"
             print "iframepost=/announcement-manager/allmon-announcement-frame.php"
-            print "iframepre="
+            
         }
     }
     ' "$INI_FILE" > "$INI_FILE.tmp" && mv "$INI_FILE.tmp" "$INI_FILE"
