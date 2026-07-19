@@ -106,7 +106,6 @@ else
     {
         if (in_section && $0 ~ "^\\[") {
             print "iframepost=/announcement-manager/allmon-announcement-frame.php"
-            print "iframepre="
             inserted = 1
             in_section = 0
         }
