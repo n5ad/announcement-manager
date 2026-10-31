@@ -75,7 +75,7 @@ if (!isAllmon3LoggedIn()) {
 <body>
     <div class="container">
      
-        <?php include '/var/www/html/announcement-manager/announcement.inc'; ?>
+        <?php include '/usr/local/share/announcement-manager/announcement.inc'; ?>
     </div>
 </body>
 </html>
